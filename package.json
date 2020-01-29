@@ -36,7 +36,6 @@
   "devDependencies": {
     "@cowtech/tslint-config": "^5.13.0",
     "@types/node": "^13.5.1",
-    "nyc": "^15.0.0",
     "prettier": "^1.19.1",
     "tap": "^14.10.6",
     "tslint": "^5.20.0",

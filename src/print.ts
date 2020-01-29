@@ -6,6 +6,7 @@ const styles = ['red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white', 'g
 
 interface PrintInfo {
   name: string
+  size: number
   error: Error | null
   throughput: string
   standardError: string
@@ -28,7 +29,7 @@ export function printResults(results: Results, colors: boolean, compare: boolean
         return { name, error: result.error, throughput: '', standardError: '', relative: '', compared: '' } as PrintInfo
       }
 
-      const { mean, standardError } = result
+      const { size, mean, standardError } = result
       const relative = last !== 0 ? (last / mean! - 1) * 100 : 0
 
       if (mode === 'base') {
@@ -41,11 +42,12 @@ export function printResults(results: Results, colors: boolean, compare: boolean
         compared = name
       }
 
-      const standardErrorString = ((standardError! / mean!) * 100).toFixed(2)
+      const standardErrorString = (standardError! * 100).toFixed(2)
       standardErrorPadding = Math.max(standardErrorPadding, standardErrorString.length)
 
       return {
         name,
+        size: size!,
         error: null,
         throughput: (1e9 / mean!).toFixed(2),
         standardError: standardErrorString,
@@ -58,18 +60,24 @@ export function printResults(results: Results, colors: boolean, compare: boolean
 
   const rows: Array<Array<string>> = entries.map((entry: PrintInfo) => {
     if (entry.error) {
-      const row = [styler(`{{gray}}${entry.name}{{-}}`), styler('{{gray}}Errored{{-}}'), styler('{{gray}}N/A{{-}}')]
+      const row = [
+        styler(`{{gray}}${entry.name}{{-}}`),
+        styler(`{{gray}}${entry.size}{{-}}`),
+        styler('{{gray}}Errored{{-}}'),
+        styler('{{gray}}N/A{{-}}')
+      ]
 
       if (compare) {
         row.push(styler('{{gray}}N/A{{-}}'))
       }
     }
 
-    const { name, throughput, standardError, relative } = entry
+    const { name, size, throughput, standardError, relative } = entry
     const color = styles[currentColor++ % styles.length]
 
     const row = [
       styler(`{{${color}}}${name}{{-}}`),
+      styler(`{{${color}}}${size}{{-}}`),
       styler(`{{${color}}}${throughput} op/sec{{-}}`),
       styler(`{{gray}}± ${standardError.padStart(standardErrorPadding, ' ')} %{{-}}`)
     ]
@@ -89,12 +97,14 @@ export function printResults(results: Results, colors: boolean, compare: boolean
 
   rows.unshift([
     styler('{{bold white}}Test{{-}}'),
+    styler('{{bold white}}Samples{{-}}'),
     styler('{{bold white}}Result{{-}}'),
     styler('{{bold white}}Tolerance{{-}}')
   ])
 
   rows.splice(rows.length - 1, 0, [
     styler('{{bold white}}Fastest test{{-}}'),
+    styler('{{bold white}}Samples{{-}}'),
     styler('{{bold white}}Result{{-}}'),
     styler('{{bold white}}Tolerance{{-}}')
   ])

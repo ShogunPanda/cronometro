@@ -53,6 +53,7 @@ export interface Context {
   queue: Array<[string, Test]>
   results: Results
   iterations: number
+  errorThreshold: number
 }
 
 export interface TestContext extends Context {

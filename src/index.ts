@@ -31,6 +31,16 @@ function runIteration(context: TestContext): void {
       context.current.records++
     }
 
+    const standardError = histogram.stddev() / Math.sqrt(context.current.records) / histogram.mean()
+
+    if (
+      context.errorThreshold &&
+      context.current.remaining / context.iterations < 0.9 &&
+      standardError < context.errorThreshold
+    ) {
+      context.current.remaining = 0
+    }
+
     if (context.current.remaining === 0) {
       context.results[context.current.name] = {
         success: true,
@@ -45,7 +55,7 @@ function runIteration(context: TestContext): void {
             accu[percentile] = value
             return accu
           }, {}),
-        standardError: histogram.stddev() / Math.sqrt(context.current.records)
+        standardError
       }
 
       schedule(() => processQueue(context))
@@ -89,7 +99,7 @@ function processQueue(context: Context): void {
   testContext.current = {
     name: next[0],
     test: next[1],
-    remaining: context.iterations,
+    remaining: context.iterations - 1,
     records: 0,
     histogram: new Histogram(1, 1e9, 5)
   }
@@ -127,11 +137,17 @@ export function cronometro(
   }
 
   // Parse and validate options
-  const { iterations, print } = { iterations: 1e4, print: true, ...options }
+  const { iterations, errorThreshold, print } = { iterations: 1e4, errorThreshold: 1, print: true, ...options }
 
   // tslint:disable-next-line strict-type-predicates
   if (typeof iterations !== 'number' || iterations < 1) {
     callback(new Error('The iterations option must be a positive number.'))
+    return promise
+  }
+
+  // tslint:disable-next-line strict-type-predicates
+  if (typeof errorThreshold !== 'number' || errorThreshold < 0 || errorThreshold > 100) {
+    callback(new Error('The errorThreshold option must be a number between 0 and 100.'))
     return promise
   }
 
@@ -140,6 +156,7 @@ export function cronometro(
     queue: Object.entries(tests), // Convert tests to a easier to process [name, func] list,
     results: {},
     iterations,
+    errorThreshold: errorThreshold / 100,
     callback(error?: Error | null, results?: Results): void {
       if (error) {
         callback!(error)

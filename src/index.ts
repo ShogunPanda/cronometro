@@ -87,7 +87,11 @@ function processQueue(context: Context): void {
   process.nextTick(() => runIteration(testContext))
 }
 
-export function benchie(tests: Tests, options: Options | Callback, callback?: Callback): Promise<Results> | undefined {
+export function cronometro(
+  tests: Tests,
+  options: Options | Callback,
+  callback?: Callback
+): Promise<Results> | undefined {
   let promise: Promise<Results> | undefined
   let promiseResolve: PromiseResolver<Results>
   let promiseReject: PromiseRejecter
@@ -152,5 +156,5 @@ export function benchie(tests: Tests, options: Options | Callback, callback?: Ca
   return promise
 }
 
-module.exports = benchie
+module.exports = cronometro
 Object.assign(module.exports, exports)

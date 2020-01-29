@@ -1,23 +1,23 @@
-# benchie
+# cronometro
 
-[![Package Version](https://img.shields.io/npm/v/benchie.svg)](https://npm.im/benchie)
-[![Dependency Status](https://img.shields.io/david/ShogunPanda/benchie)](https://david-dm.org/ShogunPanda/benchie)
-[![Build](https://github.com/ShogunPanda/benchie/workflows/CI/badge.svg)](https://github.com/ShogunPanda/benchie/actions?query=workflow%3ACI)
-[![Code Coverage](https://img.shields.io/codecov/c/gh/ShogunPanda/benchie?token=d0ae1643f35c4c4f9714a357f796d05d)](https://codecov.io/gh/ShogunPanda/benchie)
+[![Package Version](https://img.shields.io/npm/v/cronometro.svg)](https://npm.im/cronometro)
+[![Dependency Status](https://img.shields.io/david/ShogunPanda/cronometro)](https://david-dm.org/ShogunPanda/cronometro)
+[![Build](https://github.com/ShogunPanda/cronometro/workflows/CI/badge.svg)](https://github.com/ShogunPanda/cronometro/actions?query=workflow%3ACI)
+[![Code Coverage](https://img.shields.io/codecov/c/gh/ShogunPanda/cronometro?token=d0ae1643f35c4c4f9714a357f796d05d)](https://codecov.io/gh/ShogunPanda/cronometro)
 
 Simple benchmarking suite powered by HDR histograms.
 
-http://sw.cowtech.it/benchie
+http://sw.cowtech.it/cronometro
 
 ## Usage
 
-To run a benchmark, simply call the `benchie` function with the set of tests you want to run, then optionally provide a options object and a Node's style callback.
+To run a benchmark, simply call the `cronometro` function with the set of tests you want to run, then optionally provide a options object and a Node's style callback.
 
 The set of tests must a be a object whose property names are tests names, and property values are tests definitions.
 
 Each test can be either a function, a function accepting a Node style callback or a function returning a promise (hence also async functions).
 
-The return value of the benchie function is a promise which will be resolved with a results object (see below).
+The return value of the cronometro function is a promise which will be resolved with a results object (see below).
 
 If the callback is provided, it will also be called with an error or the results object
 
@@ -50,9 +50,9 @@ Each property value is a object with the following properties:
 ## Example (tabular output)
 
 ```javascript
-const benchie = require('benchie')
+const cronometro = require('cronometro')
 
-const results = benchie({
+const results = cronometro({
   test1: function() {
     // Do something
   },
@@ -79,9 +79,9 @@ Output:
 ## Example (results structure)
 
 ```javascript
-const benchie = require('benchie')
+const cronometro = require('cronometro')
 
-const results = benchie(
+const results = cronometro(
   {
     test1: function() {
       // Do something
@@ -168,7 +168,7 @@ Output:
 }
 ```
 
-## Contributing to benchie
+## Contributing to cronometro
 
 - Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet.
 - Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it.

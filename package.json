@@ -1,14 +1,18 @@
 {
-  "name": "benchie",
+  "name": "cronometro",
   "version": "0.1.0",
   "description": "Simple benchmarking suite powered by HDR histograms.",
-  "homepage": "https://sw.cowtech.it/benchie",
-  "repository": "github:ShogunPanda/benchie",
+  "homepage": "https://sw.cowtech.it/cronometro",
+  "repository": "github:ShogunPanda/cronometro",
+  "keywords": [
+    "benchmark",
+    "hdr"
+  ],
   "bugs": {
-    "url": "https://github.com/ShogunPanda/benchie/issues"
+    "url": "https://github.com/ShogunPanda/cronometro/issues"
   },
   "author": "Shogun <shogun@cowtech.it>",
-  "license": "MIT",
+  "license": "ISC",
   "private": false,
   "files": [
     "lib",

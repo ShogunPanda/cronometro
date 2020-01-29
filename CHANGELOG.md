@@ -1,3 +1,7 @@
+### 2020-01-29 / 0.2.2
+
+- fix: Fixed errorThreshold performances.
+
 ### 2020-01-29 / 0.2.1
 
 - feat: Added errorThreshold option.

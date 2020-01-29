@@ -1,0 +1,45 @@
+{
+  "name": "benchie",
+  "version": "0.1.0",
+  "description": "Simple benchmarking suite powered by HDR histograms.",
+  "homepage": "https://sw.cowtech.it/benchie",
+  "repository": "github:ShogunPanda/benchie",
+  "bugs": {
+    "url": "https://github.com/ShogunPanda/benchie/issues"
+  },
+  "author": "Shogun <shogun@cowtech.it>",
+  "license": "MIT",
+  "private": false,
+  "files": [
+    "lib",
+    "types",
+    "CHANGELOG.md",
+    "LICENSE.md",
+    "README.md"
+  ],
+  "main": "lib/index.js",
+  "typings": "types/index.d.ts",
+  "types": "types/index.d.ts",
+  "scripts": {
+    "lint": "tslint --project tsconfig.test.json -t stylish src/*.ts test/*.ts",
+    "ci": "yarn lint && tap --no-color --reporter=spec --coverage-report=json --coverage-report=text --branches 90 --functions 90 --lines 90 --statements 90 test/*.spec.ts",
+    "test": "tap --reporter=spec --coverage-report=html --coverage-report=text --no-browser test/*.spec.ts",
+    "prebuild": "rm -rf lib/* types/* && yarn lint",
+    "build": "tsc -p .",
+    "prepublishOnly": "yarn ci",
+    "postpublish": "git push origin && git push origin -f --tags"
+  },
+  "dependencies": {
+    "acquerello": "^0.1.2",
+    "native-hdr-histogram": "^0.7.0"
+  },
+  "devDependencies": {
+    "@cowtech/tslint-config": "^5.13.0",
+    "@types/node": "^13.5.1",
+    "nyc": "^15.0.0",
+    "prettier": "^1.19.1",
+    "tap": "^14.10.6",
+    "tslint": "^5.20.0",
+    "typescript": "^3.7.5"
+  }
+}

@@ -1,0 +1,156 @@
+'use strict'
+
+// @ts-ignore
+import Histogram from 'native-hdr-histogram'
+import { Callback, Context, Options, PrintOptions, Results, Tests } from './models'
+import { printResults } from './print'
+
+type PromiseResolver<T> = (value: T) => void
+type PromiseRejecter = (err: Error) => void
+
+export * from './models'
+
+function runIteration(context: Context): void {
+  function trackResults(error?: Error | null): void {
+    // Handle error
+    if (error) {
+      context.results[name] = { success: false, error }
+      processQueue(context)
+      return
+    }
+
+    const { histogram } = context.current!
+
+    if (histogram.record(Number(process.hrtime.bigint() - start))) {
+      context.current!.records++
+    }
+
+    // TODO@PI: Troubleshoot never ending runs
+    if (context.current!.remaining === 0) {
+      context.results[name] = {
+        success: true,
+        size: context.current!.records,
+        min: histogram.min(),
+        max: histogram.min(),
+        mean: histogram.mean(),
+        stddev: histogram.stddev(),
+        percentiles: histogram
+          .percentiles()
+          .reduce((accu: { [key: string]: number }, { percentile, value }: { percentile: number; value: number }) => {
+            accu[percentile] = value
+            return accu
+          }, {}),
+        standardError: histogram.stddev() / Math.sqrt(context.current!.records)
+      }
+
+      processQueue(context)
+      return
+    }
+
+    context.current!.remaining--
+    process.nextTick(() => runIteration(context))
+  }
+
+  const start = process.hrtime.bigint()
+
+  try {
+    // Execute the function and get the response time - Handle also promises
+    const callResult = context.current!.test(trackResults)
+
+    if (callResult && typeof callResult.then === 'function') {
+      callResult.then(() => trackResults(null), trackResults)
+    } else if (context.current!.test.length === 0) {
+      trackResults(null)
+    }
+  } catch (error) {
+    context.results[name] = { success: false, error }
+    processQueue(context)
+  }
+}
+
+function processQueue(context: Context): void {
+  // Get the next test to run
+  const next = context.queue.shift()
+
+  if (!next) {
+    return context.callback(null, context.results)
+  }
+
+  context.current = {
+    name: next[0],
+    test: next[1],
+    remaining: 0,
+    records: 0,
+    histogram: new Histogram(1, 1e9, 5)
+  }
+
+  process.nextTick(() => runIteration(context))
+}
+
+export function benchie(tests: Tests, options: Options | Callback, callback?: Callback): Promise<Results> | undefined {
+  let promise: Promise<Results> | undefined
+  let promiseResolve: PromiseResolver<Results>
+  let promiseReject: PromiseRejecter
+
+  if (typeof options === 'function') {
+    callback = options
+    options = {} as Options
+  }
+
+  if (!callback) {
+    promise = new Promise<Results>((resolve: PromiseResolver<Results>, reject: PromiseRejecter) => {
+      promiseResolve = resolve
+      promiseReject = reject
+    })
+
+    callback = function(err?: Error | null, results?: Results): void {
+      if (err) {
+        return promiseReject(err)
+      }
+
+      return promiseResolve(results!)
+    }
+  }
+
+  // Parse and validate options
+  const { iterations, print } = { iterations: 1e5, print: true, ...options }
+
+  // tslint:disable-next-line strict-type-predicates
+  if (typeof iterations !== 'number' || iterations < 1) {
+    callback(new Error('The iterations option must be a positive number.'))
+    return promise
+  }
+
+  // Process all tests
+  const context: Context = {
+    queue: Object.entries(tests), // Convert tests to a easier to process [name, func] list,
+    results: {},
+    iterations,
+    callback(error?: Error | null, results?: Results): void {
+      if (error) {
+        callback!(error)
+        return
+      }
+
+      if (print) {
+        const { colors, compare, compareMode }: PrintOptions = {
+          colors: true,
+          compare: false,
+          compareMode: 'base',
+          ...(print === true ? ({} as PrintOptions) : print)
+        }
+
+        printResults(results!, colors, compare, compareMode)
+      }
+
+      callback!(null, results!)
+    }
+  }
+
+  processQueue(context)
+
+  return promise
+}
+
+module.exports = benchie
+Object.assign(module.exports, exports)

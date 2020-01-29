@@ -47,7 +47,9 @@ export interface Context {
     queue: Array<[string, Test]>;
     results: Results;
     iterations: number;
-    current?: {
+}
+export interface TestContext extends Context {
+    current: {
         name: string;
         test: Test;
         remaining: number;

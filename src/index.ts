@@ -2,7 +2,7 @@
 
 // @ts-ignore
 import Histogram from 'native-hdr-histogram'
-import { Callback, Context, Options, PrintOptions, Results, Tests } from './models'
+import { Callback, Context, Options, PrintOptions, Results, TestContext, Tests } from './models'
 import { printResults } from './print'
 
 type PromiseResolver<T> = (value: T) => void
@@ -10,26 +10,25 @@ type PromiseRejecter = (err: Error) => void
 
 export * from './models'
 
-function runIteration(context: Context): void {
+function runIteration(context: TestContext): void {
   function trackResults(error?: Error | null): void {
     // Handle error
     if (error) {
-      context.results[name] = { success: false, error }
+      context.results[context.current.name] = { success: false, error }
       processQueue(context)
       return
     }
 
-    const { histogram } = context.current!
+    const { histogram } = context.current
 
     if (histogram.record(Number(process.hrtime.bigint() - start))) {
-      context.current!.records++
+      context.current.records++
     }
 
-    // TODO@PI: Troubleshoot never ending runs
-    if (context.current!.remaining === 0) {
-      context.results[name] = {
+    if (context.current.remaining === 0) {
+      context.results[context.current.name] = {
         success: true,
-        size: context.current!.records,
+        size: context.current.records,
         min: histogram.min(),
         max: histogram.min(),
         mean: histogram.mean(),
@@ -40,14 +39,14 @@ function runIteration(context: Context): void {
             accu[percentile] = value
             return accu
           }, {}),
-        standardError: histogram.stddev() / Math.sqrt(context.current!.records)
+        standardError: histogram.stddev() / Math.sqrt(context.current.records)
       }
 
       processQueue(context)
       return
     }
 
-    context.current!.remaining--
+    context.current.remaining--
     process.nextTick(() => runIteration(context))
   }
 
@@ -55,15 +54,15 @@ function runIteration(context: Context): void {
 
   try {
     // Execute the function and get the response time - Handle also promises
-    const callResult = context.current!.test(trackResults)
+    const callResult = context.current.test(trackResults)
 
     if (callResult && typeof callResult.then === 'function') {
       callResult.then(() => trackResults(null), trackResults)
-    } else if (context.current!.test.length === 0) {
+    } else if (context.current.test.length === 0) {
       trackResults(null)
     }
   } catch (error) {
-    context.results[name] = { success: false, error }
+    context.results[context.current.name] = { success: false, error }
     processQueue(context)
   }
 }
@@ -76,15 +75,16 @@ function processQueue(context: Context): void {
     return context.callback(null, context.results)
   }
 
-  context.current = {
+  const testContext = context as TestContext
+  testContext.current = {
     name: next[0],
     test: next[1],
-    remaining: 0,
+    remaining: context.iterations,
     records: 0,
     histogram: new Histogram(1, 1e9, 5)
   }
 
-  process.nextTick(() => runIteration(context))
+  process.nextTick(() => runIteration(testContext))
 }
 
 export function benchie(tests: Tests, options: Options | Callback, callback?: Callback): Promise<Results> | undefined {
@@ -113,7 +113,7 @@ export function benchie(tests: Tests, options: Options | Callback, callback?: Ca
   }
 
   // Parse and validate options
-  const { iterations, print } = { iterations: 1e5, print: true, ...options }
+  const { iterations, print } = { iterations: 1e4, print: true, ...options }
 
   // tslint:disable-next-line strict-type-predicates
   if (typeof iterations !== 'number' || iterations < 1) {

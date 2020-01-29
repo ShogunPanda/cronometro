@@ -31,14 +31,19 @@
   },
   "dependencies": {
     "acquerello": "^0.1.2",
-    "native-hdr-histogram": "^0.7.0"
+    "native-hdr-histogram": "^0.7.0",
+    "table": "^5.4.6"
   },
   "devDependencies": {
     "@cowtech/tslint-config": "^5.13.0",
     "@types/node": "^13.5.1",
+    "@types/table": "^4.0.7",
     "prettier": "^1.19.1",
     "tap": "^14.10.6",
     "tslint": "^5.20.0",
     "typescript": "^3.7.5"
+  },
+  "engines": {
+    "node": ">= 12.0.0"
   }
 }

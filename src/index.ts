@@ -10,12 +10,18 @@ type PromiseRejecter = (err: Error) => void
 
 export * from './models'
 
+const debug = (process.env.NODE_DEBUG || '').includes('cronometro')
+
+function schedule(operation: () => void): void {
+  process.nextTick(operation)
+}
+
 function runIteration(context: TestContext): void {
   function trackResults(error?: Error | null): void {
     // Handle error
     if (error) {
       context.results[context.current.name] = { success: false, error }
-      processQueue(context)
+      schedule(() => processQueue(context))
       return
     }
 
@@ -42,12 +48,16 @@ function runIteration(context: TestContext): void {
         standardError: histogram.stddev() / Math.sqrt(context.current.records)
       }
 
-      processQueue(context)
+      schedule(() => processQueue(context))
       return
     }
 
     context.current.remaining--
-    process.nextTick(() => runIteration(context))
+    schedule(() => runIteration(context))
+  }
+
+  if (debug) {
+    console.debug(`cronometro: Executing test ${context.current.name}, ${context.current.remaining} iterations to go`)
   }
 
   const start = process.hrtime.bigint()
@@ -63,7 +73,7 @@ function runIteration(context: TestContext): void {
     }
   } catch (error) {
     context.results[context.current.name] = { success: false, error }
-    processQueue(context)
+    schedule(() => processQueue(context))
   }
 }
 
@@ -84,7 +94,7 @@ function processQueue(context: Context): void {
     histogram: new Histogram(1, 1e9, 5)
   }
 
-  process.nextTick(() => runIteration(testContext))
+  schedule(() => runIteration(testContext))
 }
 
 export function cronometro(
@@ -151,7 +161,7 @@ export function cronometro(
     }
   }
 
-  processQueue(context)
+  schedule(() => processQueue(context))
 
   return promise
 }

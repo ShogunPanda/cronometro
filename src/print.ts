@@ -42,7 +42,7 @@ export function printResults(results: Results, colors: boolean, compare: boolean
         compared = name
       }
 
-      const standardErrorString = (standardError! * 100).toFixed(2)
+      const standardErrorString = ((standardError! / mean!) * 100).toFixed(2)
       standardErrorPadding = Math.max(standardErrorPadding, standardErrorString.length)
 
       return {

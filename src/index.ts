@@ -31,14 +31,17 @@ function runIteration(context: TestContext): void {
       context.current.records++
     }
 
-    const standardError = histogram.stddev() / Math.sqrt(context.current.records) / histogram.mean()
+    if (context.errorThreshold > 0) {
+      const completedPercentage = Math.floor((1 - context.current.remaining / context.iterations) * 10000)
 
-    if (
-      context.errorThreshold &&
-      context.current.remaining / context.iterations < 0.9 &&
-      standardError < context.errorThreshold
-    ) {
-      context.current.remaining = 0
+      // Check if abort the test earlier. It is checked every 5% after 10% of the iterations
+      if (completedPercentage > 1000 && completedPercentage % 500 === 0) {
+        const standardErrorPercentage = histogram.stddev() / Math.sqrt(context.current.records) / histogram.mean()
+
+        if (standardErrorPercentage < context.errorThreshold) {
+          context.current.remaining = 0
+        }
+      }
     }
 
     if (context.current.remaining === 0) {
@@ -55,7 +58,7 @@ function runIteration(context: TestContext): void {
             accu[percentile] = value
             return accu
           }, {}),
-        standardError
+        standardError: histogram.stddev() / Math.sqrt(context.current.records)
       }
 
       schedule(() => processQueue(context))

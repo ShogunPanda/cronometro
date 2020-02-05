@@ -23,7 +23,21 @@ export function printResults(results: Results, colors: boolean, compare: boolean
   let standardErrorPadding = 0
 
   const entries: Array<PrintInfo> = Object.entries(results)
-    .sort((a: [string, Result], b: [string, Result]) => b[1].mean! - a[1].mean!)
+    .sort((a: [string, Result], b: [string, Result]) => {
+      if (!a[1].success && !b[1].success) {
+        return 0
+      }
+
+      if (a[1].success && !b[1].success) {
+        return 1
+      }
+
+      if (!a[1].success && b[1].success) {
+        return -1
+      }
+
+      return b[1].mean! - a[1].mean!
+    })
     .map(([name, result]: [string, Result]) => {
       if (!result.success) {
         return { name, error: result.error, throughput: '', standardError: '', relative: '', compared: '' } as PrintInfo

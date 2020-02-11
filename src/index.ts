@@ -20,7 +20,7 @@ function runIteration(context: TestContext): void {
   function trackResults(error?: Error | null): void {
     // Handle error
     if (error) {
-      context.results[context.current.name] = { success: false, error }
+      context.results[context.current.name] = { success: false, error, mean: 0 }
       schedule(() => processQueue(context))
       return
     }

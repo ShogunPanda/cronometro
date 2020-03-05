@@ -99,6 +99,7 @@ function processQueue(context: Context): void {
   }
 
   const testContext = context as TestContext
+
   testContext.current = {
     name: next[0],
     test: next[1],
@@ -140,7 +141,13 @@ export function cronometro(
   }
 
   // Parse and validate options
-  const { iterations, errorThreshold, print } = { iterations: 1e4, errorThreshold: 1, print: true, ...options }
+  const { iterations, errorThreshold, print, warmup } = {
+    iterations: 1e4,
+    warmup: true,
+    errorThreshold: 1,
+    print: true,
+    ...options
+  }
 
   // tslint:disable-next-line strict-type-predicates
   if (typeof iterations !== 'number' || iterations < 1) {
@@ -181,7 +188,22 @@ export function cronometro(
     }
   }
 
-  schedule(() => processQueue(context))
+  const boot: Context = {
+    queue: warmup ? context.queue.slice(0) : [],
+    results: {},
+    iterations,
+    errorThreshold: errorThreshold / 100,
+    callback(error?: Error | null): void {
+      if (error) {
+        callback!(error)
+        return
+      }
+
+      schedule(() => processQueue(context))
+    }
+  }
+
+  schedule(() => processQueue(boot))
 
   return promise
 }

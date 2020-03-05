@@ -27,6 +27,7 @@ The supported options are the following:
 
 - `iterations`: The number of iterations to run for each test. Must be a positive number. The default is `10000`.
 - `errorThreshold`: If active, it stops the test run before the desider number of iterations if the standard error is below the provided value and at least 10% of the iterations have been run. Must be a number between `0` (which disables this option) and `100`. The default is `1`.
+- `warmup`: Run the suite twice, the first time without collecting results. The default is `true`.
 - `print`: If print results on the console in a pretty tabular way. The default is `true`. It can be a boolean or a printing options object. The supported printing options are:
   - `colors`: If use colors. Default is `true`.
   - `compare`: If compare tests in the output. Default is `false`.

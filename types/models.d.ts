@@ -6,6 +6,7 @@ export interface PrintOptions {
 export interface Options {
     iterations: number;
     print: boolean | PrintOptions;
+    warmup: boolean;
 }
 export declare type StaticTest = () => any;
 export declare type AsyncTest = (cb: Callback) => any;

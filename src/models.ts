@@ -7,6 +7,7 @@ export interface PrintOptions {
 export interface Options {
   iterations: number
   print: boolean | PrintOptions
+  warmup: boolean
 }
 
 export type StaticTest = () => any

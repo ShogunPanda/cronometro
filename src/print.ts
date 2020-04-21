@@ -14,6 +14,21 @@ interface PrintInfo {
   compared: string
 }
 
+let currentLogger: (message: string, ...params: Array<any>) => void = console.log
+
+export function setLogger(logger: (message: string, ...params: Array<any>) => void): void {
+  currentLogger = logger
+}
+
+export function log(message: string): void {
+  const debug = (process.env.NODE_DEBUG ?? '').includes('cronometro')
+  if (debug) {
+    currentLogger(
+      `[cronometro ${process.pid.toString().padEnd(5, ' ')} ${new Date(Date.now()).toISOString()}] ${message}`
+    )
+  }
+}
+
 export function printResults(results: Results, colors: boolean, compare: boolean, mode: 'base' | 'previous'): void {
   const styler = colors ? colorize : clean
 
@@ -23,33 +38,41 @@ export function printResults(results: Results, colors: boolean, compare: boolean
   let standardErrorPadding = 0
 
   const entries: Array<PrintInfo> = Object.entries(results)
-    .sort((a: [string, Result], b: [string, Result]) => b[1].mean! - a[1].mean!)
+    .sort((a: [string, Result], b: [string, Result]) => (!a[1].success ? -1 : b[1].mean - a[1].mean))
     .map(([name, result]: [string, Result]) => {
       if (!result.success) {
-        return { name, error: result.error, throughput: '', standardError: '', relative: '', compared: '' } as PrintInfo
+        return {
+          name,
+          size: 0,
+          error: result.error!,
+          throughput: '',
+          standardError: '',
+          relative: '',
+          compared: ''
+        }
       }
 
       const { size, mean, standardError } = result
-      const relative = last !== 0 ? (last / mean! - 1) * 100 : 0
+      const relative = last !== 0 ? (last / mean - 1) * 100 : 0
 
       if (mode === 'base') {
         if (last === 0) {
-          last = mean!
+          last = mean
           compared = name
         }
       } else {
-        last = mean!
+        last = mean
         compared = name
       }
 
-      const standardErrorString = ((standardError! / mean!) * 100).toFixed(2)
+      const standardErrorString = ((standardError / mean) * 100).toFixed(2)
       standardErrorPadding = Math.max(standardErrorPadding, standardErrorString.length)
 
       return {
         name,
-        size: size!,
+        size,
         error: null,
-        throughput: (1e9 / mean!).toFixed(2),
+        throughput: (1e9 / mean).toFixed(2),
         standardError: standardErrorString,
         relative: relative.toFixed(2),
         compared
@@ -70,6 +93,8 @@ export function printResults(results: Results, colors: boolean, compare: boolean
       if (compare) {
         row.push(styler('{{gray}}N/A{{-}}'))
       }
+
+      return row
     }
 
     const { name, size, throughput, standardError, relative } = entry
@@ -93,10 +118,10 @@ export function printResults(results: Results, colors: boolean, compare: boolean
     return row
   })
 
-  const compareHeader = `Difference with ${mode === 'base' ? compared : 'previous'}`
+  const compareHeader = `Difference with ${mode === 'base' ? 'slowest' : 'previous'}`
 
   rows.unshift([
-    styler('{{bold white}}Test{{-}}'),
+    styler('{{bold white}}Slower tests{{-}}'),
     styler('{{bold white}}Samples{{-}}'),
     styler('{{bold white}}Result{{-}}'),
     styler('{{bold white}}Tolerance{{-}}')
@@ -114,7 +139,7 @@ export function printResults(results: Results, colors: boolean, compare: boolean
     rows[rows.length - 2].push(styler(`{{bold white}}${compareHeader}{{-}}`))
   }
 
-  console.log(
+  currentLogger(
     table(rows, {
       columns: {
         0: {

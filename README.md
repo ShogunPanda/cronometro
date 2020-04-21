@@ -9,6 +9,36 @@ Simple benchmarking suite powered by HDR histograms.
 
 http://sw.cowtech.it/cronometro
 
+## Requirements
+
+Cronometro uses [worker_threads](https://nodejs.org/dist/latest-v12.x/docs/api/worker_threads.html) to run tests in a isolated V8 enviroments to offer the most accurate benchmark. This imposes the restrictions described in the subsections below.
+
+### Supported Node versions
+
+Only Node 12.x and above are supported.
+
+### Script invocation
+
+The main script which invokes cronometro must be executable without command line arguments, as it is how it will be called within a Worker Thread.
+
+If you need to configure the script at runtime, use environment variables and optionally configuration files.
+
+### TypeScript
+
+cronometro uses [ts-node](https://www.npmjs.com/package/ts-node) to compile TypeScript files on the fly.
+
+ts-node and TypeScript are not installed automatically by cronometro (as they are listed in `peerDependencies`) so you need to do it manually.
+
+To pass the `tsconfig.json` project file to use, use the `TS_NODE_PROJECT` environment variable.
+
+### API use
+
+If you use cronometro as an API and manipulate its return value, consider that the exact same code its executed in both the main thread and in worker threads.
+
+Inside worker threads, the cronometro function invocation will return no value and no callbacks are invoked.
+
+You can use `isMainThread` from Worker Threads API to check in which environment the script is running.
+
 ## Usage
 
 To run a benchmark, simply call the `cronometro` function with the set of tests you want to run, then optionally provide a options object and a Node's style callback.
@@ -55,10 +85,10 @@ Each property value is a object with the following properties:
 const cronometro = require('cronometro')
 
 const results = cronometro({
-  test1: function() {
+  test1: function () {
     // Do something
   },
-  test2: function() {
+  test2: function () {
     // Do something else
   }
 })
@@ -85,10 +115,10 @@ const cronometro = require('cronometro')
 
 const results = cronometro(
   {
-    test1: function() {
+    test1: function () {
       // Do something
     },
-    test2: function() {
+    test2: function () {
       // Do something else
     }
   },

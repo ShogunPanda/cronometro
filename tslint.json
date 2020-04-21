@@ -1,3 +1,0 @@
-{
-  "extends": ["@cowtech/tslint-config/index"]
-}

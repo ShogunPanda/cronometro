@@ -1,0 +1,7 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "tsconfig.test.json"
+  },
+  "extends": ["@cowtech/eslint-config/typescript"]
+}

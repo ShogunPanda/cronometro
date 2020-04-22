@@ -26,8 +26,8 @@
   "types": "types/index.d.ts",
   "scripts": {
     "lint": "eslint src/*.ts test/*.ts",
-    "ci": "yarn lint && tap --no-color --reporter=spec --coverage-report=json --coverage-report=text --branches 90 --functions 90 --lines 90 --statements 90 test/*.spec.ts",
-    "test": "tap --reporter=spec --coverage-report=html --coverage-report=text --no-browser test/*.spec.ts",
+    "ci": "yarn lint && tap --timeout=60 --no-color --reporter=spec --coverage-report=json --coverage-report=text --branches 90 --functions 90 --lines 90 --statements 90 test/*.spec.ts",
+    "test": "tap --timeout=60 --reporter=spec --coverage-report=html --coverage-report=text --no-browser test/*.spec.ts",
     "prebuild": "rm -rf lib/* types/* && yarn lint",
     "build": "tsc -p .",
     "prepublishOnly": "yarn ci",

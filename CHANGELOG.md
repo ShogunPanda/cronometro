@@ -1,3 +1,10 @@
+### 2020-04-22 / 0.4.0
+
+- chore: Allow greater test timeouts.
+- feat: Removed useless debug infrastructure.
+- feat: Reimplemented warmup mode.
+- feat: Use worker_threads for execution. Tested everything.
+
 ### 2020-03-05 / 0.3.0
 
 - feat: Added warmup option.

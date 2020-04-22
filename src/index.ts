@@ -3,7 +3,7 @@
 import { join } from 'path'
 import { isMainThread, Worker, workerData } from 'worker_threads'
 import { Callback, Context, defaultOptions, Options, PrintOptions, Result, Results, Tests } from './models'
-import { log, printResults } from './print'
+import { printResults } from './print'
 
 type PromiseResolver<T> = (value: T) => void
 type PromiseRejecter = (err: Error) => void
@@ -32,8 +32,6 @@ function scheduleNextTest(context: Context): void {
 
 function run(context: Context): void {
   const name = context.tests[context.current][0]
-
-  log(`Creating worker for test ${name}, ${context.tests.length - context.current - 1} tests to go`)
 
   const worker = new Worker(join(__dirname, '../lib/runner.js'), {
     workerData: {

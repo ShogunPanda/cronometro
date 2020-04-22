@@ -20,15 +20,6 @@ export function setLogger(logger: (message: string, ...params: Array<any>) => vo
   currentLogger = logger
 }
 
-export function log(message: string): void {
-  const debug = (process.env.NODE_DEBUG ?? '').includes('cronometro')
-  if (debug) {
-    currentLogger(
-      `[cronometro ${process.pid.toString().padEnd(5, ' ')} ${new Date(Date.now()).toISOString()}] ${message}`
-    )
-  }
-}
-
 export function printResults(results: Results, colors: boolean, compare: boolean, mode: 'base' | 'previous'): void {
   const styler = colors ? colorize : clean
 

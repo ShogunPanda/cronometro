@@ -1,4 +1,4 @@
-import { SinonSpyCall, spy } from 'sinon'
+import { spy } from 'sinon'
 // @ts-ignore
 import t from 'tap'
 import { isMainThread } from 'worker_threads'
@@ -178,47 +178,6 @@ if (!isMainThread) {
           /║\s+(single|multiple)\s+|\s+10\s+|\s+\d+\.\d{2}\sop\/sec\s+|\s+±\s\d+.\d{2}\s%\s+|\s+\\+\s+\d+.\d{2}\s%\s+║/
         )
         t.match(output, /║\s+(error)\s+|\s+0\s+|\s+Errored\s+|\s+N\/A\s+|\s+N\/A\s+║/)
-        t.end()
-      }
-    )
-  })
-
-  t.test('Printing - Debugging', (t: any) => {
-    const prevEnv = process.env.NODE_DEBUG
-    process.env.NODE_DEBUG = 'cronometro'
-
-    cronometro(
-      {
-        single() {
-          // No-op
-        },
-        multiple() {
-          // No-op
-        },
-        error() {
-          throw new Error('FAILED')
-        }
-      },
-      { print: { compare: true, compareMode: 'previous' } },
-      (err: Error | null) => {
-        process.env.NODE_DEBUG = prevEnv
-        t.strictEqual(err, null)
-
-        const invocations = loggerSpy.getCalls().map((c: SinonSpyCall) => c.args[0])
-
-        t.match(
-          invocations[0],
-          /\[cronometro \d+\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z\] Creating worker for test single, 2 tests to go/
-        )
-        t.match(
-          invocations[1],
-          /\[cronometro \d+\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z\] Creating worker for test multiple, 1 tests to go/
-        )
-        t.match(
-          invocations[2],
-          /\[cronometro \d+\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z\] Creating worker for test error, 0 tests to go/
-        )
-
         t.end()
       }
     )

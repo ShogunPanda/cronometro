@@ -1,6 +1,5 @@
 import { build as buildHistogram } from 'hdr-histogram-js'
 import { Percentiles, percentiles, Result, TestContext, WorkerContext } from './models'
-import { log } from './print'
 
 /* istanbul ignore next */
 function noOp(): void {
@@ -74,8 +73,6 @@ function handleTestIteration(context: TestContext, error?: Error | null): void {
 }
 
 function runTestIteration(context: TestContext): void {
-  log(`Executing test ${context.name}, ${context.total - context.executed} iterations to go`)
-
   // Execute the function and get the response time - Handle also promises
   try {
     context.start = process.hrtime.bigint()

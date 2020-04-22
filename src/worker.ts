@@ -1,5 +1,5 @@
 import { build as buildHistogram } from 'hdr-histogram-js'
-import { Percentiles, percentiles, TestContext, WorkerContext } from './models'
+import { Percentiles, percentiles, Result, TestContext, WorkerContext } from './models'
 import { log } from './print'
 
 /* istanbul ignore next */
@@ -13,8 +13,7 @@ function handleTestIteration(context: TestContext, error?: Error | null): void {
 
   // Handle error
   if (error) {
-    // Notify the caller we failed
-    context.notifier({
+    return context.callback({
       success: false,
       error,
       size: 0,
@@ -25,8 +24,6 @@ function handleTestIteration(context: TestContext, error?: Error | null): void {
       percentiles: {},
       standardError: 0
     })
-
-    return context.callback(1)
   }
 
   // Get some parameters
@@ -41,10 +38,10 @@ function handleTestIteration(context: TestContext, error?: Error | null): void {
   let stop = false
 
   if (errorThreshold > 0) {
-    const completedPercentage = Math.floor((1 - executed / total) * 10000)
+    const completedPercentage = Math.floor((executed / total) * 10000)
 
     // Check if abort the test earlier. It is checked every 5% after 10% of the iterations
-    if (completedPercentage > 1000 && completedPercentage % 500 === 0) {
+    if (completedPercentage >= 1000 && completedPercentage % 500 === 0) {
       const standardErrorPercentage = histogram.getStdDeviation() / Math.sqrt(executed) / histogram.getMean()
 
       if (standardErrorPercentage < errorThreshold) {
@@ -57,8 +54,7 @@ function handleTestIteration(context: TestContext, error?: Error | null): void {
   if (stop || executed > total) {
     const stdDev = histogram.getStdDeviation()
 
-    // Notify the caller the results
-    context.notifier({
+    return context.callback({
       success: true,
       size: executed,
       min: histogram.minNonZeroValue,
@@ -71,8 +67,6 @@ function handleTestIteration(context: TestContext, error?: Error | null): void {
       }, {}),
       standardError: stdDev / Math.sqrt(executed)
     })
-
-    return context.callback(0)
   }
 
   // Schedule next iteration
@@ -106,12 +100,8 @@ function runTestIteration(context: TestContext): void {
   }
 }
 
-export function runWorker(
-  context: WorkerContext,
-  notifier: (value: any) => void,
-  callback: (code: number) => void
-): void {
-  const { tests, index, iterations, errorThreshold } = context
+export function runWorker(context: WorkerContext, notifier: (value: any) => void, cb: (code: number) => void): void {
+  const { warmup, tests, index, iterations, errorThreshold } = context
 
   // Require the original file to build tests
   const [name, test] = tests[index]
@@ -131,7 +121,16 @@ export function runWorker(
     start: BigInt(0),
     handler: noOp,
     notifier,
-    callback
+    callback(result: Result): void {
+      if (warmup) {
+        context.warmup = false
+        return runWorker(context, notifier, cb)
+      }
+
+      notifier(result)
+      // eslint-disable-next-line standard/no-callback-literal
+      cb(result.success ? 0 : 1)
+    }
   }
 
   // Bind the handler to the context

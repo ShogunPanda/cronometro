@@ -40,6 +40,7 @@ function run(context: Context): void {
       path: process.argv[1],
       index: context.current,
       iterations: context.iterations,
+      warmup: context.warmup,
       errorThreshold: context.errorThreshold
     }
   })

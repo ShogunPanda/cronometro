@@ -14,6 +14,7 @@ t.test('Worker execution - Handle sync functions that succeed', (t: any) => {
       tests: [['main', main]],
       index: 0,
       iterations: 10000,
+      warmup: false,
       errorThreshold: 100
     },
     notifier,
@@ -25,7 +26,7 @@ t.test('Worker execution - Handle sync functions that succeed', (t: any) => {
 
       t.true(result.success)
       t.type(result.error, 'undefined')
-      t.equal(result.size, 499)
+      t.equal(result.size, 1000)
       t.type(result.min, 'number')
       t.type(result.max, 'number')
       t.type(result.mean, 'number')
@@ -51,6 +52,7 @@ t.test('Worker execution - Handle sync functions that throw errors', (t: any) =>
       tests: [['main', main]],
       index: 0,
       iterations: 5,
+      warmup: false,
       errorThreshold: 100
     },
     notifier,
@@ -90,6 +92,7 @@ t.test('Worker execution - Handle callback functions that succeed', (t: any) => 
       tests: [['main', mainSpy as Test]],
       index: 0,
       iterations: 10000,
+      warmup: false,
       errorThreshold: 1e-9
     },
     notifier,
@@ -131,6 +134,7 @@ t.test('Worker execution - Handle callback functions that throw errors', (t: any
       tests: [['main', mainSpy as Test]],
       index: 0,
       iterations: 5,
+      warmup: false,
       errorThreshold: 0
     },
     notifier,
@@ -166,6 +170,7 @@ t.test('Worker execution - Handle promise functions that resolves', (t: any) => 
       tests: [['main', main]],
       index: 0,
       iterations: 5,
+      warmup: false,
       errorThreshold: 0
     },
     notifier,
@@ -203,6 +208,7 @@ t.test('Worker execution - Handle promise functions that rejects', (t: any) => {
       tests: [['main', main]],
       index: 0,
       iterations: 5,
+      warmup: false,
       errorThreshold: 0
     },
     notifier,
@@ -222,6 +228,84 @@ t.test('Worker execution - Handle promise functions that rejects', (t: any) => {
       t.equal(result.stddev, 0)
       t.equal(result.standardError, 0)
       t.strictDeepEqual(result.percentiles, {})
+
+      t.end()
+    }
+  )
+})
+
+t.test('Worker execution - Handle warmup mode enabled', (t: any) => {
+  const main = stub()
+  const notifier = spy()
+
+  runWorker(
+    {
+      path: 'fs',
+      tests: [['main', main]],
+      index: 0,
+      iterations: 5,
+      warmup: true,
+      errorThreshold: 0
+    },
+    notifier,
+    (code: number) => {
+      t.equal(main.callCount, 10)
+      t.equal(notifier.callCount, 1)
+      t.equal(code, 0)
+
+      const result = notifier.getCall(0).args[0]
+
+      t.true(result.success)
+      t.type(result.error, 'undefined')
+      t.equal(result.size, 5)
+      t.type(result.min, 'number')
+      t.type(result.max, 'number')
+      t.type(result.mean, 'number')
+      t.type(result.stddev, 'number')
+      t.type(result.standardError, 'number')
+
+      for (const percentile of percentiles) {
+        t.type(result.percentiles[percentile.toString()], 'number')
+      }
+
+      t.end()
+    }
+  )
+})
+
+t.test('Worker execution - Handle warmup mode disabled', (t: any) => {
+  const main = stub()
+  const notifier = spy()
+
+  runWorker(
+    {
+      path: 'fs',
+      tests: [['main', main]],
+      index: 0,
+      iterations: 5,
+      warmup: false,
+      errorThreshold: 0
+    },
+    notifier,
+    (code: number) => {
+      t.equal(main.callCount, 5)
+      t.equal(notifier.callCount, 1)
+      t.equal(code, 0)
+
+      const result = notifier.getCall(0).args[0]
+
+      t.true(result.success)
+      t.type(result.error, 'undefined')
+      t.equal(result.size, 5)
+      t.type(result.min, 'number')
+      t.type(result.max, 'number')
+      t.type(result.mean, 'number')
+      t.type(result.stddev, 'number')
+      t.type(result.standardError, 'number')
+
+      for (const percentile of percentiles) {
+        t.type(result.percentiles[percentile.toString()], 'number')
+      }
 
       t.end()
     }

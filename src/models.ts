@@ -61,6 +61,7 @@ export interface WorkerContext {
   tests: Array<[string, Test]>
   index: number
   iterations: number
+  warmup: boolean
   errorThreshold: number
 }
 
@@ -74,7 +75,7 @@ export interface TestContext {
   start: bigint
   handler(error?: Error | null): void
   notifier(value: any): void
-  callback(code: number): void
+  callback(result: Result): void
 }
 
 export const defaultOptions = {

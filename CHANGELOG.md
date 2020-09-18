@@ -1,3 +1,7 @@
+### 2020-09-18 / 0.6.0
+
+- feat: Remove setup option. Allow complex tests with before/after.
+
 ### 2020-09-18 / 0.5.0
 
 - feat: Add setup option to prepare tests.

@@ -81,7 +81,6 @@ export function cronometro(
   /* istanbul ignore next */
   if (!isMainThread) {
     workerData.tests = Object.entries(tests)
-    workerData.setup = options && typeof options !== 'function' && options.setup ? options.setup : {}
     return
   }
 

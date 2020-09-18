@@ -19,8 +19,13 @@ export interface Options {
 export type StaticTest = () => any
 export type AsyncTest = (cb: Callback) => any
 export type PromiseTest = () => Promise<any>
+export type TestFunction = StaticTest | AsyncTest | PromiseTest
 
-export type Test = StaticTest | AsyncTest | PromiseTest
+export interface Test {
+  test?: TestFunction
+  before?: SetupFunction
+  after?: SetupFunction
+}
 
 export type Callback = ((err: Error | null) => void) | ((err: null, results: Results) => any)
 
@@ -41,7 +46,7 @@ export interface Result {
 }
 
 export interface Tests {
-  [key: string]: Test
+  [key: string]: TestFunction | Test
 }
 
 export interface Results {
@@ -53,7 +58,7 @@ export interface Context {
   iterations: number
   errorThreshold: number
   print: boolean | PrintOptions
-  tests: Array<[string, Test]>
+  tests: Array<[string, TestFunction | Test]>
   results: Results
   current: number
   callback: Callback
@@ -61,8 +66,7 @@ export interface Context {
 
 export interface WorkerContext {
   path: string
-  tests: Array<[string, Test]>
-  setup: { [key: string]: SetupFunction }
+  tests: Array<[string, TestFunction | Test]>
   index: number
   iterations: number
   warmup: boolean
@@ -71,7 +75,7 @@ export interface WorkerContext {
 
 export interface TestContext {
   name: string
-  test: Test
+  test: TestFunction
   errorThreshold: number
   total: number
   executed: number

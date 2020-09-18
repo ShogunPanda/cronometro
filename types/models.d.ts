@@ -17,7 +17,12 @@ export interface Options {
 export declare type StaticTest = () => any;
 export declare type AsyncTest = (cb: Callback) => any;
 export declare type PromiseTest = () => Promise<any>;
-export declare type Test = StaticTest | AsyncTest | PromiseTest;
+export declare type TestFunction = StaticTest | AsyncTest | PromiseTest;
+export interface Test {
+    test?: TestFunction;
+    before?: SetupFunction;
+    after?: SetupFunction;
+}
 export declare type Callback = ((err: Error | null) => void) | ((err: null, results: Results) => any);
 export interface Percentiles {
     [key: string]: number;
@@ -34,7 +39,7 @@ export interface Result {
     percentiles: Percentiles;
 }
 export interface Tests {
-    [key: string]: Test;
+    [key: string]: TestFunction | Test;
 }
 export interface Results {
     [key: string]: Result;
@@ -44,17 +49,14 @@ export interface Context {
     iterations: number;
     errorThreshold: number;
     print: boolean | PrintOptions;
-    tests: Array<[string, Test]>;
+    tests: Array<[string, TestFunction | Test]>;
     results: Results;
     current: number;
     callback: Callback;
 }
 export interface WorkerContext {
     path: string;
-    tests: Array<[string, Test]>;
-    setup: {
-        [key: string]: SetupFunction;
-    };
+    tests: Array<[string, TestFunction | Test]>;
     index: number;
     iterations: number;
     warmup: boolean;
@@ -62,7 +64,7 @@ export interface WorkerContext {
 }
 export interface TestContext {
     name: string;
-    test: Test;
+    test: TestFunction;
     errorThreshold: number;
     total: number;
     executed: number;

@@ -43,19 +43,26 @@ You can use `isMainThread` from Worker Threads API to check in which environment
 
 To run a benchmark, simply call the `cronometro` function with the set of tests you want to run, then optionally provide a options object and a Node's style callback.
 
-The set of tests must a be a object whose property names are tests names, and property values are tests definitions.
-
-Each test can be either a function, a function accepting a Node style callback or a function returning a promise (hence also async functions).
-
 The return value of the cronometro function is a promise which will be resolved with a results object (see below).
 
-If the callback is provided, it will also be called with an error or the results object
+If the callback is provided, it will also be called with an error or the results object.
+
+The set of tests must a be a object whose property names are tests names, and property values are tests definitions.
+
+A test can be defined as a function containing the test to run or an object containing ore or more of the following properties:
+
+- `test`: The function containing the test to run. If omitted, the test will be a no-op.
+- `before`: A setup function to execute before starting test iteration.
+- `after`: A cleanup function to execute after all test iteration have been run.
+
+Each of the `test` functions above can be either a function, a function accepting a Node style callback or a function returning a promise (hence also async functions).
+
+Each of the `before` or `after` functions above can be either a function accepting a Node style callback or a function returning a promise (hence also async functions).
 
 ## Options
 
 The supported options are the following:
 
-- `setup`: An object whose properties names are the same as the test and values are setup functions. The functions will be run before the test. Both async/promise and callback style functions are accepted.
 - `iterations`: The number of iterations to run for each test. Must be a positive number. The default is `10000`.
 - `errorThreshold`: If active, it stops the test run before the desider number of iterations if the standard error is below the provided value and at least 10% of the iterations have been run. Must be a number between `0` (which disables this option) and `100`. The default is `1`.
 - `warmup`: Run the suite twice, the first time without collecting results. The default is `true`.

@@ -1,5 +1,5 @@
 import { build as buildHistogram } from 'hdr-histogram-js'
-import { Percentiles, percentiles, Result, SetupFunction, TestContext, WorkerContext } from './models'
+import { Percentiles, percentiles, Result, SetupFunction, TestContext, TestFunction, WorkerContext } from './models'
 
 /* istanbul ignore next */
 function noOp(): void {
@@ -101,7 +101,7 @@ function runTestIteration(context: TestContext): void {
   }
 }
 
-function afterSetup(testContext: TestContext, err?: Error | null): void {
+function beforeCallback(testContext: TestContext, err?: Error | null): void {
   if (err) {
     return testContext.callback({
       success: false,
@@ -120,12 +120,61 @@ function afterSetup(testContext: TestContext, err?: Error | null): void {
   return process.nextTick(() => runTestIteration(testContext))
 }
 
+function afterCallback(
+  result: Result,
+  notifier: (value: any) => void,
+  cb: (code: number) => void,
+  err?: Error | null
+): void {
+  let notifierCode = result.success ? 0 : 1
+
+  if (err) {
+    notifier({
+      success: false,
+      error: err,
+      size: 0,
+      min: 0,
+      max: 0,
+      mean: 0,
+      stddev: 0,
+      percentiles: {},
+      standardError: 0
+    })
+
+    notifierCode = 1
+  } else {
+    notifier(result)
+  }
+
+  cb(notifierCode)
+}
+
 export function runWorker(context: WorkerContext, notifier: (value: any) => void, cb: (code: number) => void): void {
-  const { warmup, tests, index, iterations, errorThreshold, setup } = context
+  const { warmup, tests, index, iterations, errorThreshold } = context
 
   // Require the original file to build tests
-  const [name, test] = tests[index]
-  const testSetup: SetupFunction = typeof setup[name] === 'function' ? setup[name] : noSetup
+  const [name, testDefinition] = tests[index]
+
+  // Prepare the test
+  let test: TestFunction = noOp
+  let before: SetupFunction = noSetup
+  let after: SetupFunction = noSetup
+
+  if (typeof testDefinition === 'function') {
+    test = testDefinition
+  } else {
+    if (typeof testDefinition.test === 'function') {
+      test = testDefinition.test
+    }
+
+    if (typeof testDefinition.before === 'function') {
+      before = testDefinition.before
+    }
+
+    if (typeof testDefinition.after === 'function') {
+      after = testDefinition.after
+    }
+  }
 
   // Prepare the context
   const testContext: TestContext = {
@@ -148,9 +197,12 @@ export function runWorker(context: WorkerContext, notifier: (value: any) => void
         return runWorker(context, notifier, cb)
       }
 
-      notifier(result)
-      // eslint-disable-next-line standard/no-callback-literal
-      cb(result.success ? 0 : 1)
+      const callback = afterCallback.bind(null, result, notifier, cb)
+      const afterResponse = after(callback)
+
+      if (afterResponse && typeof afterResponse.then === 'function') {
+        afterResponse.then(callback, callback)
+      }
     }
   }
 
@@ -158,10 +210,10 @@ export function runWorker(context: WorkerContext, notifier: (value: any) => void
   testContext.handler = handleTestIteration.bind(null, testContext)
 
   // Run the test setup, then start the test
-  const callback = afterSetup.bind(null, testContext)
-  const testSetupResponse = testSetup(callback)
+  const callback = beforeCallback.bind(null, testContext)
+  const beforeResponse = before(callback)
 
-  if (testSetupResponse && typeof testSetupResponse.then === 'function') {
-    testSetupResponse.then(callback, callback)
+  if (beforeResponse && typeof beforeResponse.then === 'function') {
+    beforeResponse.then(callback, callback)
   }
 }

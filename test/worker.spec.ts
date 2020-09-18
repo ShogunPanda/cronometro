@@ -12,6 +12,7 @@ t.test('Worker execution - Handle sync functions that succeed', (t: any) => {
     {
       path: 'fs',
       tests: [['main', main]],
+      setup: {},
       index: 0,
       iterations: 10000,
       warmup: false,
@@ -19,8 +20,8 @@ t.test('Worker execution - Handle sync functions that succeed', (t: any) => {
     },
     notifier,
     (code: number) => {
-      t.true(main.called)
       t.equal(code, 0)
+      t.true(main.called)
 
       const result = notifier.getCall(0).args[0]
 
@@ -50,6 +51,7 @@ t.test('Worker execution - Handle sync functions that throw errors', (t: any) =>
     {
       path: 'fs',
       tests: [['main', main]],
+      setup: {},
       index: 0,
       iterations: 5,
       warmup: false,
@@ -57,8 +59,8 @@ t.test('Worker execution - Handle sync functions that throw errors', (t: any) =>
     },
     notifier,
     (code: number) => {
-      t.true(main.called)
       t.equal(code, 1)
+      t.true(main.called)
 
       const result = notifier.getCall(0).args[0]
 
@@ -90,6 +92,7 @@ t.test('Worker execution - Handle callback functions that succeed', (t: any) => 
     {
       path: 'fs',
       tests: [['main', mainSpy as Test]],
+      setup: {},
       index: 0,
       iterations: 10000,
       warmup: false,
@@ -97,8 +100,8 @@ t.test('Worker execution - Handle callback functions that succeed', (t: any) => 
     },
     notifier,
     (code: number) => {
-      t.true(mainSpy.called)
       t.equal(code, 0)
+      t.true(mainSpy.called)
 
       const result = notifier.getCall(0).args[0]
 
@@ -132,6 +135,7 @@ t.test('Worker execution - Handle callback functions that throw errors', (t: any
     {
       path: 'fs',
       tests: [['main', mainSpy as Test]],
+      setup: {},
       index: 0,
       iterations: 5,
       warmup: false,
@@ -139,8 +143,8 @@ t.test('Worker execution - Handle callback functions that throw errors', (t: any
     },
     notifier,
     (code: number) => {
-      t.true(mainSpy.called)
       t.equal(code, 1)
+      t.true(mainSpy.called)
 
       const result = notifier.getCall(0).args[0]
 
@@ -160,7 +164,7 @@ t.test('Worker execution - Handle callback functions that throw errors', (t: any
   )
 })
 
-t.test('Worker execution - Handle promise functions that resolves', (t: any) => {
+t.test('Worker execution - Handle promise functions that resolve', (t: any) => {
   const main = stub().resolves()
   const notifier = spy()
 
@@ -168,6 +172,7 @@ t.test('Worker execution - Handle promise functions that resolves', (t: any) => 
     {
       path: 'fs',
       tests: [['main', main]],
+      setup: {},
       index: 0,
       iterations: 5,
       warmup: false,
@@ -175,8 +180,8 @@ t.test('Worker execution - Handle promise functions that resolves', (t: any) => 
     },
     notifier,
     (code: number) => {
-      t.true(main.called)
       t.equal(code, 0)
+      t.true(main.called)
 
       const result = notifier.getCall(0).args[0]
 
@@ -198,7 +203,7 @@ t.test('Worker execution - Handle promise functions that resolves', (t: any) => 
   )
 })
 
-t.test('Worker execution - Handle promise functions that rejects', (t: any) => {
+t.test('Worker execution - Handle promise functions that reject', (t: any) => {
   const main = stub().rejects(new Error('FAILED'))
   const notifier = spy()
 
@@ -206,6 +211,7 @@ t.test('Worker execution - Handle promise functions that rejects', (t: any) => {
     {
       path: 'fs',
       tests: [['main', main]],
+      setup: {},
       index: 0,
       iterations: 5,
       warmup: false,
@@ -213,8 +219,8 @@ t.test('Worker execution - Handle promise functions that rejects', (t: any) => {
     },
     notifier,
     (code: number) => {
-      t.true(main.called)
       t.equal(code, 1)
+      t.true(main.called)
 
       const result = notifier.getCall(0).args[0]
 
@@ -242,6 +248,7 @@ t.test('Worker execution - Handle warmup mode enabled', (t: any) => {
     {
       path: 'fs',
       tests: [['main', main]],
+      setup: {},
       index: 0,
       iterations: 5,
       warmup: true,
@@ -249,9 +256,9 @@ t.test('Worker execution - Handle warmup mode enabled', (t: any) => {
     },
     notifier,
     (code: number) => {
+      t.equal(code, 0)
       t.equal(main.callCount, 10)
       t.equal(notifier.callCount, 1)
-      t.equal(code, 0)
 
       const result = notifier.getCall(0).args[0]
 
@@ -281,6 +288,7 @@ t.test('Worker execution - Handle warmup mode disabled', (t: any) => {
     {
       path: 'fs',
       tests: [['main', main]],
+      setup: {},
       index: 0,
       iterations: 5,
       warmup: false,
@@ -288,15 +296,238 @@ t.test('Worker execution - Handle warmup mode disabled', (t: any) => {
     },
     notifier,
     (code: number) => {
+      t.equal(code, 0)
       t.equal(main.callCount, 5)
       t.equal(notifier.callCount, 1)
-      t.equal(code, 0)
 
       const result = notifier.getCall(0).args[0]
 
       t.true(result.success)
       t.type(result.error, 'undefined')
       t.equal(result.size, 5)
+      t.type(result.min, 'number')
+      t.type(result.max, 'number')
+      t.type(result.mean, 'number')
+      t.type(result.stddev, 'number')
+      t.type(result.standardError, 'number')
+
+      for (const percentile of percentiles) {
+        t.type(result.percentiles[percentile.toString()], 'number')
+      }
+
+      t.end()
+    }
+  )
+})
+
+t.test('Worker setup - Handle callback setup functions', (t: any) => {
+  const main = stub()
+  const setup = spy()
+  const notifier = spy()
+
+  runWorker(
+    {
+      path: 'fs',
+      tests: [['main', main]],
+      setup: {
+        main(cb: (err?: Error | null) => void): void {
+          setup()
+          cb()
+        }
+      },
+      index: 0,
+      iterations: 10000,
+      warmup: false,
+      errorThreshold: 100
+    },
+    notifier,
+    (code: number) => {
+      t.equal(code, 0)
+      t.equal(setup.callCount, 1)
+      t.true(main.called)
+      t.equal(notifier.callCount, 1)
+
+      const result = notifier.getCall(0).args[0]
+
+      t.true(result.success)
+      t.type(result.error, 'undefined')
+      t.equal(result.size, 1000)
+      t.type(result.min, 'number')
+      t.type(result.max, 'number')
+      t.type(result.mean, 'number')
+      t.type(result.stddev, 'number')
+      t.type(result.standardError, 'number')
+
+      for (const percentile of percentiles) {
+        t.type(result.percentiles[percentile.toString()], 'number')
+      }
+
+      t.end()
+    }
+  )
+})
+
+t.test('Worker setup - Handle callback setup functions that throw errors', (t: any) => {
+  const main = stub()
+  const notifier = spy()
+
+  runWorker(
+    {
+      path: 'fs',
+      tests: [['main', main]],
+      setup: {
+        main(cb: (err?: Error | null) => void): void {
+          cb(new Error('FAILED'))
+        }
+      },
+      index: 0,
+      iterations: 10000,
+      warmup: false,
+      errorThreshold: 100
+    },
+    notifier,
+    (code: number) => {
+      t.equal(code, 1)
+      t.false(main.called)
+
+      const result = notifier.getCall(0).args[0]
+
+      t.false(result.success)
+      t.type(result.error, Error)
+      t.equal(result.error!.message, 'FAILED')
+      t.equal(result.size, 0)
+      t.equal(result.min, 0)
+      t.equal(result.max, 0)
+      t.equal(result.mean, 0)
+      t.equal(result.stddev, 0)
+      t.equal(result.standardError, 0)
+      t.strictDeepEqual(result.percentiles, {})
+
+      t.end()
+    }
+  )
+})
+
+t.test('Worker setup - Handle promise setup functions that resolve', (t: any) => {
+  const main = stub()
+  const setup = spy()
+  const notifier = spy()
+
+  runWorker(
+    {
+      path: 'fs',
+      tests: [['main', main]],
+      setup: {
+        async main(): Promise<void> {
+          setup()
+        }
+      },
+      index: 0,
+      iterations: 10000,
+      warmup: false,
+      errorThreshold: 100
+    },
+    notifier,
+    (code: number) => {
+      t.equal(code, 0)
+      t.equal(setup.callCount, 1)
+      t.true(main.called)
+      t.equal(notifier.callCount, 1)
+
+      const result = notifier.getCall(0).args[0]
+
+      t.true(result.success)
+      t.type(result.error, 'undefined')
+      t.equal(result.size, 1000)
+      t.type(result.min, 'number')
+      t.type(result.max, 'number')
+      t.type(result.mean, 'number')
+      t.type(result.stddev, 'number')
+      t.type(result.standardError, 'number')
+
+      for (const percentile of percentiles) {
+        t.type(result.percentiles[percentile.toString()], 'number')
+      }
+
+      t.end()
+    }
+  )
+})
+
+t.test('Worker setup - Handle promise setup functions that reject', (t: any) => {
+  const main = stub()
+  const notifier = spy()
+
+  runWorker(
+    {
+      path: 'fs',
+      tests: [['main', main]],
+      setup: {
+        async main(): Promise<void> {
+          throw new Error('FAILED')
+        }
+      },
+      index: 0,
+      iterations: 10000,
+      warmup: false,
+      errorThreshold: 100
+    },
+    notifier,
+    (code: number) => {
+      t.equal(code, 1)
+      t.false(main.called)
+
+      const result = notifier.getCall(0).args[0]
+
+      t.false(result.success)
+      t.type(result.error, Error)
+      t.equal(result.error!.message, 'FAILED')
+      t.equal(result.size, 0)
+      t.equal(result.min, 0)
+      t.equal(result.max, 0)
+      t.equal(result.mean, 0)
+      t.equal(result.stddev, 0)
+      t.equal(result.standardError, 0)
+      t.strictDeepEqual(result.percentiles, {})
+
+      t.end()
+    }
+  )
+})
+
+t.test('Worker setup - Allows setup function to be defined only for a subset of the tests', (t: any) => {
+  const main = stub()
+  const notifier = spy()
+  const setup = spy()
+
+  runWorker(
+    {
+      path: 'fs',
+      tests: [
+        ['main', main],
+        ['another', main]
+      ],
+      setup: {
+        async main(): Promise<void> {
+          setup()
+        }
+      },
+      index: 0,
+      iterations: 10000,
+      warmup: false,
+      errorThreshold: 100
+    },
+    notifier,
+    (code: number) => {
+      t.equal(code, 0)
+      t.equal(setup.callCount, 1)
+      t.true(main.called)
+
+      const result = notifier.getCall(0).args[0]
+
+      t.true(result.success)
+      t.type(result.error, 'undefined')
+      t.equal(result.size, 1000)
       t.type(result.min, 'number')
       t.type(result.max, 'number')
       t.type(result.mean, 'number')

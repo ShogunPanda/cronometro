@@ -6,8 +6,11 @@ export interface PrintOptions {
   compareMode?: 'base' | 'previous'
 }
 
+export type SetupFunction = (cb: (err?: Error | null) => void) => Promise<any> | void
+
 export interface Options {
   iterations: number
+  setup: { [key: string]: SetupFunction }
   errorThreshold: number
   print: boolean | PrintOptions
   warmup: boolean
@@ -19,7 +22,7 @@ export type PromiseTest = () => Promise<any>
 
 export type Test = StaticTest | AsyncTest | PromiseTest
 
-export type Callback = ((err: Error | null) => any) | ((err: null, results: Results) => any)
+export type Callback = ((err: Error | null) => void) | ((err: null, results: Results) => any)
 
 export interface Percentiles {
   [key: string]: number
@@ -59,6 +62,7 @@ export interface Context {
 export interface WorkerContext {
   path: string
   tests: Array<[string, Test]>
+  setup: { [key: string]: SetupFunction }
   index: number
   iterations: number
   warmup: boolean

@@ -1,9 +1,13 @@
 import { build as buildHistogram } from 'hdr-histogram-js'
-import { Percentiles, percentiles, Result, TestContext, WorkerContext } from './models'
+import { Percentiles, percentiles, Result, SetupFunction, TestContext, WorkerContext } from './models'
 
 /* istanbul ignore next */
 function noOp(): void {
   // No-op
+}
+
+function noSetup(cb: (err?: Error | null) => void): void {
+  cb()
 }
 
 function handleTestIteration(context: TestContext, error?: Error | null): void {
@@ -97,11 +101,31 @@ function runTestIteration(context: TestContext): void {
   }
 }
 
+function afterSetup(testContext: TestContext, err?: Error | null): void {
+  if (err) {
+    return testContext.callback({
+      success: false,
+      error: err,
+      size: 0,
+      min: 0,
+      max: 0,
+      mean: 0,
+      stddev: 0,
+      percentiles: {},
+      standardError: 0
+    })
+  }
+
+  // Schedule the first run
+  return process.nextTick(() => runTestIteration(testContext))
+}
+
 export function runWorker(context: WorkerContext, notifier: (value: any) => void, cb: (code: number) => void): void {
-  const { warmup, tests, index, iterations, errorThreshold } = context
+  const { warmup, tests, index, iterations, errorThreshold, setup } = context
 
   // Require the original file to build tests
   const [name, test] = tests[index]
+  const testSetup: SetupFunction = typeof setup[name] === 'function' ? setup[name] : noSetup
 
   // Prepare the context
   const testContext: TestContext = {
@@ -133,6 +157,11 @@ export function runWorker(context: WorkerContext, notifier: (value: any) => void
   // Bind the handler to the context
   testContext.handler = handleTestIteration.bind(null, testContext)
 
-  // Schedule the first run
-  process.nextTick(() => runTestIteration(testContext))
+  // Run the test setup, then start the test
+  const callback = afterSetup.bind(null, testContext)
+  const testSetupResponse = testSetup(callback)
+
+  if (testSetupResponse && typeof testSetupResponse.then === 'function') {
+    testSetupResponse.then(callback, callback)
+  }
 }

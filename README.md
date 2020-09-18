@@ -55,6 +55,7 @@ If the callback is provided, it will also be called with an error or the results
 
 The supported options are the following:
 
+- `setup`: An object whose properties names are the same as the test and values are setup functions. The functions will be run before the test. Both async/promise and callback style functions are accepted.
 - `iterations`: The number of iterations to run for each test. Must be a positive number. The default is `10000`.
 - `errorThreshold`: If active, it stops the test run before the desider number of iterations if the standard error is below the provided value and at least 10% of the iterations have been run. Must be a number between `0` (which disables this option) and `100`. The default is `1`.
 - `warmup`: Run the suite twice, the first time without collecting results. The default is `true`.
@@ -127,7 +128,14 @@ const results = cronometro(
       subject.replace(/1/g, 'a').replace(/2/g, 'b').replace(/3/g, 'c')
     }
   },
-  { print: { compare: true } },
+  {
+    setup: {
+      single(cb) {
+        cb()
+      }
+    },
+    print: { compare: true }
+  },
   (err, results) => {
     if (err) {
       throw err

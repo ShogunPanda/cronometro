@@ -1,3 +1,7 @@
+### 2020-09-18 / 0.5.0
+
+- feat: Add setup option to prepare tests.
+
 ### 2020-04-22 / 0.4.0
 
 - chore: Allow greater test timeouts.

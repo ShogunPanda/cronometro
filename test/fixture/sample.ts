@@ -11,7 +11,7 @@ const subject =
 cronometro(
   {
     single() {
-      subject.replace(pattern, (m) => replacements[m])
+      subject.replace(pattern, m => replacements[m])
     },
     multiple() {
       subject.replace(/1/g, 'a').replace(/2/g, 'b').replace(/3/g, 'c')

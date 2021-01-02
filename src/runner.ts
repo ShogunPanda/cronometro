@@ -10,6 +10,7 @@ if (workerData.path.endsWith('.ts')) {
   const instance = Symbol.for('ts-node.register.instance')
 
   if (!(instance in process)) {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     require('ts-node').register({ project: process.env.TS_NODE_PROJECT })
   }
 }

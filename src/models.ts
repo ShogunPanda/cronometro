@@ -1,4 +1,4 @@
-import { AbstractHistogram } from 'hdr-histogram-js'
+import { Histogram } from 'hdr-histogram-js'
 
 export interface PrintOptions {
   colors?: boolean
@@ -6,6 +6,7 @@ export interface PrintOptions {
   compareMode?: 'base' | 'previous'
 }
 
+// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
 export type SetupFunction = (cb: (err?: Error | null) => void) => Promise<any> | void
 
 export interface Options {
@@ -79,11 +80,11 @@ export interface TestContext {
   errorThreshold: number
   total: number
   executed: number
-  histogram: AbstractHistogram
+  histogram: Histogram
   start: bigint
-  handler(error?: Error | null): void
-  notifier(value: any): void
-  callback(result: Result): void
+  handler: (error?: Error | null) => void
+  notifier: (value: any) => void
+  callback: (result: Result) => void
 }
 
 export const defaultOptions = {

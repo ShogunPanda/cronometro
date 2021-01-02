@@ -45,7 +45,7 @@ function handleTestIteration(context: TestContext, error?: Error | null): void {
 
     // Check if abort the test earlier. It is checked every 5% after 10% of the iterations
     if (completedPercentage >= 1000 && completedPercentage % 500 === 0) {
-      const standardErrorPercentage = histogram.getStdDeviation() / Math.sqrt(executed) / histogram.getMean()
+      const standardErrorPercentage = histogram.stdDeviation / Math.sqrt(executed) / histogram.mean
 
       if (standardErrorPercentage < errorThreshold) {
         stop = true
@@ -55,14 +55,14 @@ function handleTestIteration(context: TestContext, error?: Error | null): void {
 
   // If the test is over
   if (stop || executed > total) {
-    const stdDev = histogram.getStdDeviation()
+    const stdDev = histogram.stdDeviation
 
     return context.callback({
       success: true,
       size: executed,
       min: histogram.minNonZeroValue,
       max: histogram.maxValue,
-      mean: histogram.getMean(),
+      mean: histogram.mean,
       stddev: stdDev,
       percentiles: percentiles.reduce((accu: Percentiles, percentile: number) => {
         accu[percentile] = histogram.getValueAtPercentile(percentile)

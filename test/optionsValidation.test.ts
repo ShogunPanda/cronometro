@@ -1,8 +1,11 @@
-// @ts-ignore
+/* eslint-disable @typescript-eslint/no-floating-promises */
+
 import t from 'tap'
 import { cronometro } from '../src'
 
-t.test('Options validation', async (t: any) => {
+type Test = typeof t
+
+t.test('Options validation', async (t: Test) => {
   await t.rejects(
     () =>
       cronometro(
@@ -17,7 +20,7 @@ t.test('Options validation', async (t: any) => {
         },
         { iterations: -1 }
       ),
-    { message: 'The iterations option must be a positive number.' }
+    new Error('The iterations option must be a positive number.')
   )
 
   cronometro(

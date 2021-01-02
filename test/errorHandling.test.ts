@@ -1,7 +1,10 @@
-// @ts-ignore
+/* eslint-disable @typescript-eslint/no-floating-promises */
+
 import t from 'tap'
 import { isMainThread } from 'worker_threads'
-import { Callback, cronometro, percentiles } from '../src'
+import { cronometro, percentiles } from '../src'
+
+type Test = typeof t
 
 if (!isMainThread) {
   cronometro(
@@ -9,7 +12,7 @@ if (!isMainThread) {
       single() {
         Buffer.alloc(10)
       },
-      multiple(_done: Callback) {
+      multiple() {
         Buffer.alloc(10)
 
         if (process.argv.length > 0) {
@@ -20,13 +23,13 @@ if (!isMainThread) {
     () => false
   )
 } else {
-  t.test('Unhandled errored tests handling', async (t: any) => {
+  t.test('Errored tests handling', async (t: Test) => {
     const results = await cronometro(
       {
         single() {
           Buffer.alloc(10)
         },
-        multiple(_done: Callback) {
+        multiple() {
           Buffer.alloc(10)
 
           if (process.argv.length > 0) {

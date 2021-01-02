@@ -1,4 +1,4 @@
-import { AbstractHistogram } from 'hdr-histogram-js';
+import { Histogram } from 'hdr-histogram-js';
 export interface PrintOptions {
     colors?: boolean;
     compare?: boolean;
@@ -68,11 +68,11 @@ export interface TestContext {
     errorThreshold: number;
     total: number;
     executed: number;
-    histogram: AbstractHistogram;
+    histogram: Histogram;
     start: bigint;
-    handler(error?: Error | null): void;
-    notifier(value: any): void;
-    callback(result: Result): void;
+    handler: (error?: Error | null) => void;
+    notifier: (value: any) => void;
+    callback: (result: Result) => void;
 }
 export declare const defaultOptions: {
     iterations: number;

@@ -3,7 +3,7 @@
 [![Package Version](https://img.shields.io/npm/v/cronometro.svg)](https://npm.im/cronometro)
 [![Dependency Status](https://img.shields.io/david/ShogunPanda/cronometro)](https://david-dm.org/ShogunPanda/cronometro)
 [![Build](https://github.com/ShogunPanda/cronometro/workflows/CI/badge.svg)](https://github.com/ShogunPanda/cronometro/actions?query=workflow%3ACI)
-[![Code Coverage](https://img.shields.io/codecov/c/gh/ShogunPanda/cronometro?token=d0ae1643f35c4c4f9714a357f796d05d)](https://codecov.io/gh/ShogunPanda/cronometro)
+[![Code Coverage](https://img.shields.io/codecov/c/gh/ShogunPanda/cronometro?token=LhUiSgWHoI)](https://codecov.io/gh/ShogunPanda/cronometro)
 
 Simple benchmarking suite powered by HDR histograms.
 
@@ -129,7 +129,7 @@ const subject = '123123123123123123123123123123123123123123123123'
 const results = cronometro(
   {
     single() {
-      subject.replace(pattern, (m) => replacements[m])
+      subject.replace(pattern, m => replacements[m])
     },
     multiple() {
       subject.replace(/1/g, 'a').replace(/2/g, 'b').replace(/3/g, 'c')

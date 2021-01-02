@@ -1,7 +1,10 @@
-// @ts-ignore
+/* eslint-disable @typescript-eslint/no-floating-promises */
+
 import t from 'tap'
 import { isMainThread } from 'worker_threads'
 import { cronometro, percentiles } from '../src'
+
+type Test = typeof t
 
 if (!isMainThread) {
   cronometro(
@@ -17,7 +20,7 @@ if (!isMainThread) {
     () => false
   )
 } else {
-  t.test('Collecting results', async (t: any) => {
+  t.only('Collecting results', async (t: Test) => {
     const results = await cronometro(
       {
         single() {

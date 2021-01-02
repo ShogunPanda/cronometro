@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
+
 import { spy } from 'sinon'
-// @ts-ignore
 import t from 'tap'
 import { isMainThread } from 'worker_threads'
 import { cronometro, defaultOptions, percentiles, Results } from '../src'
 import { setLogger } from '../src/print'
+
+type Test = typeof t
 
 function removeStyle(source: string): string {
   // eslint-disable-next-line no-control-regex
@@ -35,7 +38,7 @@ if (!isMainThread) {
     done()
   })
 
-  t.test('Printing - Default options', (t: any) => {
+  t.test('Printing - Default options', (t: Test) => {
     cronometro(
       {
         single() {
@@ -89,7 +92,7 @@ if (!isMainThread) {
     )
   })
 
-  t.test('Printing - No colors', (t: any) => {
+  t.test('Printing - No colors', (t: Test) => {
     cronometro(
       {
         single() {
@@ -116,7 +119,7 @@ if (!isMainThread) {
     )
   })
 
-  t.test('Printing - Base compare', (t: any) => {
+  t.test('Printing - Base compare', (t: Test) => {
     cronometro(
       {
         single() {
@@ -147,7 +150,7 @@ if (!isMainThread) {
     )
   })
 
-  t.test('Printing - Previous compare', (t: any) => {
+  t.test('Printing - Previous compare', (t: Test) => {
     cronometro(
       {
         single() {

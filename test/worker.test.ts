@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { spy, stub } from 'sinon'
-// @ts-ignore
 import t from 'tap'
 import { percentiles, Test } from '../src'
 import { runWorker } from '../src/worker'
 
-t.test('Worker execution - Handle sync functions that succeed', (t: any) => {
+type TapTest = typeof t
+
+t.test('Worker execution - Handle sync functions that succeed', (t: TapTest) => {
   const main = stub()
   const notifier = spy()
 
@@ -42,7 +44,7 @@ t.test('Worker execution - Handle sync functions that succeed', (t: any) => {
   )
 })
 
-t.test('Worker execution - Handle sync functions that throw errors', (t: any) => {
+t.test('Worker execution - Handle sync functions that throw errors', (t: TapTest) => {
   const main = stub().throws(new Error('FAILED'))
   const notifier = spy()
 
@@ -78,7 +80,7 @@ t.test('Worker execution - Handle sync functions that throw errors', (t: any) =>
   )
 })
 
-t.test('Worker execution - Handle callback functions that succeed', (t: any) => {
+t.test('Worker execution - Handle callback functions that succeed', (t: TapTest) => {
   function main(cb: (err?: Error) => void): void {
     cb()
   }
@@ -121,7 +123,7 @@ t.test('Worker execution - Handle callback functions that succeed', (t: any) => 
   )
 })
 
-t.test('Worker execution - Handle callback functions that throw errors', (t: any) => {
+t.test('Worker execution - Handle callback functions that throw errors', (t: TapTest) => {
   function main(cb: (err?: Error) => void): void {
     cb(new Error('FAILED'))
   }
@@ -162,7 +164,7 @@ t.test('Worker execution - Handle callback functions that throw errors', (t: any
   )
 })
 
-t.test('Worker execution - Handle promise functions that resolve', (t: any) => {
+t.test('Worker execution - Handle promise functions that resolve', (t: TapTest) => {
   const main = stub().resolves()
   const notifier = spy()
 
@@ -201,7 +203,7 @@ t.test('Worker execution - Handle promise functions that resolve', (t: any) => {
   )
 })
 
-t.test('Worker execution - Handle promise functions that reject', (t: any) => {
+t.test('Worker execution - Handle promise functions that reject', (t: TapTest) => {
   const main = stub().rejects(new Error('FAILED'))
   const notifier = spy()
 
@@ -238,7 +240,7 @@ t.test('Worker execution - Handle promise functions that reject', (t: any) => {
   )
 })
 
-t.test('Worker execution - Handle warmup mode enabled', (t: any) => {
+t.test('Worker execution - Handle warmup mode enabled', (t: TapTest) => {
   const main = stub()
   const notifier = spy()
 
@@ -278,7 +280,7 @@ t.test('Worker execution - Handle warmup mode enabled', (t: any) => {
   )
 })
 
-t.test('Worker execution - Handle warmup mode disabled', (t: any) => {
+t.test('Worker execution - Handle warmup mode disabled', (t: TapTest) => {
   const main = stub()
   const notifier = spy()
 
@@ -318,7 +320,7 @@ t.test('Worker execution - Handle warmup mode disabled', (t: any) => {
   )
 })
 
-t.test('Worker setup - Handle callback before functions', (t: any) => {
+t.test('Worker setup - Handle callback before functions', (t: TapTest) => {
   const main = stub()
   const setup = spy()
   const notifier = spy()
@@ -370,7 +372,7 @@ t.test('Worker setup - Handle callback before functions', (t: any) => {
   )
 })
 
-t.test('Worker setup - Handle callback before functions that throw errors', (t: any) => {
+t.test('Worker setup - Handle callback before functions that throw errors', (t: TapTest) => {
   const main = stub()
   const notifier = spy()
 
@@ -416,7 +418,7 @@ t.test('Worker setup - Handle callback before functions that throw errors', (t: 
   )
 })
 
-t.test('Worker setup - Handle promise before functions that resolve', (t: any) => {
+t.test('Worker setup - Handle promise before functions that resolve', (t: TapTest) => {
   const main = stub()
   const setup = spy()
   const notifier = spy()
@@ -467,7 +469,7 @@ t.test('Worker setup - Handle promise before functions that resolve', (t: any) =
   )
 })
 
-t.test('Worker setup - Handle promise before functions that reject', (t: any) => {
+t.test('Worker setup - Handle promise before functions that reject', (t: TapTest) => {
   const main = stub()
   const notifier = spy()
 
@@ -513,7 +515,7 @@ t.test('Worker setup - Handle promise before functions that reject', (t: any) =>
   )
 })
 
-t.test('Worker setup - Handle callback after functions', (t: any) => {
+t.test('Worker setup - Handle callback after functions', (t: TapTest) => {
   const main = stub()
   const setup = spy()
   const notifier = spy()
@@ -565,7 +567,7 @@ t.test('Worker setup - Handle callback after functions', (t: any) => {
   )
 })
 
-t.test('Worker setup - Handle callback after functions that throw errors', (t: any) => {
+t.test('Worker setup - Handle callback after functions that throw errors', (t: TapTest) => {
   const main = stub()
   const notifier = spy()
 
@@ -611,7 +613,7 @@ t.test('Worker setup - Handle callback after functions that throw errors', (t: a
   )
 })
 
-t.test('Worker setup - Handle promise after functions that resolve', (t: any) => {
+t.test('Worker setup - Handle promise after functions that resolve', (t: TapTest) => {
   const main = stub()
   const setup = spy()
   const notifier = spy()
@@ -662,7 +664,7 @@ t.test('Worker setup - Handle promise after functions that resolve', (t: any) =>
   )
 })
 
-t.test('Worker setup - Handle promise after functions that reject', (t: any) => {
+t.test('Worker setup - Handle promise after functions that reject', (t: TapTest) => {
   const main = stub()
   const notifier = spy()
 
@@ -708,7 +710,7 @@ t.test('Worker setup - Handle promise after functions that reject', (t: any) => 
   )
 })
 
-t.test('Worker execution - Handle empty tets', (t: any) => {
+t.test('Worker execution - Handle empty tets', (t: TapTest) => {
   const notifier = spy()
 
   runWorker(

@@ -23,6 +23,8 @@ if (!isMainThread) {
     () => false
   )
 } else {
+  t.setTimeout(120000)
+
   t.test('Errored tests handling', async (t: Test) => {
     const results = await cronometro(
       {

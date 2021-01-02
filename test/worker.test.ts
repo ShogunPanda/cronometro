@@ -6,6 +6,8 @@ import { runWorker } from '../src/worker'
 
 type TapTest = typeof t
 
+t.setTimeout(120000)
+
 t.test('Worker execution - Handle sync functions that succeed', (t: TapTest) => {
   const main = stub()
   const notifier = spy()

@@ -33,6 +33,8 @@ if (!isMainThread) {
     () => false
   )
 } else {
+  t.setTimeout(120000)
+
   t.afterEach((done: () => void) => {
     loggerSpy.resetHistory()
     done()

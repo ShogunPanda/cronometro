@@ -20,6 +20,8 @@ if (!isMainThread) {
     () => false
   )
 } else {
+  t.setTimeout(120000)
+
   t.only('Collecting results', async (t: Test) => {
     const results = await cronometro(
       {

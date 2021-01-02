@@ -1,3 +1,8 @@
+### 2021-01-02 / 0.7.0
+
+- test: Increased tests timeout.
+- chore: Updated dependencies, code and tools.
+
 ### 2020-09-18 / 0.6.0
 
 - feat: Remove setup option. Allow complex tests with before/after.

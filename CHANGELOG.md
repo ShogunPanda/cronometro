@@ -1,3 +1,9 @@
+### 2021-01-03 / 0.7.1
+
+- chore: Updated linter config.
+- chore: Minor formatting.
+- chore: Updated config.
+
 ### 2021-01-02 / 0.7.0
 
 - test: Increased tests timeout.

@@ -1,21 +1,8 @@
 'use strict';
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.cronometro = void 0;
-const path_1 = require("path");
-const worker_threads_1 = require("worker_threads");
-const models_1 = require("./models");
-const print_1 = require("./print");
-__exportStar(require("./models"), exports);
+import { isMainThread, Worker, workerData } from 'worker_threads';
+import { defaultOptions, runnerPath } from "./models.mjs";
+import { printResults } from "./print.mjs";
+export * from "./models.mjs";
 function scheduleNextTest(context) {
     // We still have work to do
     if (context.current < context.tests.length) {
@@ -28,13 +15,13 @@ function scheduleNextTest(context) {
             compareMode: 'base',
             ...(context.print === true ? {} : context.print)
         };
-        print_1.printResults(context.results, colors, compare, compareMode);
+        printResults(context.results, colors, compare, compareMode);
     }
     context.callback(null, context.results);
 }
 function run(context) {
     const name = context.tests[context.current][0];
-    const worker = new worker_threads_1.Worker(path_1.join(__dirname, '../lib/runner.js'), {
+    const worker = new Worker(runnerPath, {
         workerData: {
             path: process.argv[1],
             index: context.current,
@@ -64,12 +51,12 @@ function run(context) {
         scheduleNextTest(context);
     });
 }
-function cronometro(tests, options, cb
+export function cronometro(tests, options, cb
 // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
 ) {
     /* istanbul ignore next */
-    if (!worker_threads_1.isMainThread) {
-        worker_threads_1.workerData.tests = Object.entries(tests);
+    if (!isMainThread) {
+        workerData.tests = Object.entries(tests);
         return;
     }
     let promise;
@@ -93,7 +80,7 @@ function cronometro(tests, options, cb
         };
     }
     // Parse and validate options
-    const { iterations, errorThreshold, print, warmup } = { ...models_1.defaultOptions, ...options };
+    const { iterations, errorThreshold, print, warmup } = { ...defaultOptions, ...options };
     // tslint:disable-next-line strict-type-predicates
     if (typeof iterations !== 'number' || iterations < 1) {
         callback(new Error('The iterations option must be a positive number.'));
@@ -118,6 +105,10 @@ function cronometro(tests, options, cb
     process.nextTick(() => run(context));
     return promise;
 }
-exports.cronometro = cronometro;
-module.exports = cronometro;
-Object.assign(module.exports, exports);
+export default cronometro;
+// Fix CommonJS exporting
+/* istanbul ignore else */
+if (typeof module !== 'undefined') {
+    module.exports = cronometro;
+    Object.assign(module.exports, exports);
+}

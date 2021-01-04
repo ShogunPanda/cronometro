@@ -81,3 +81,4 @@ export declare const defaultOptions: {
     print: boolean;
 };
 export declare const percentiles: number[];
+export declare const runnerPath: string;

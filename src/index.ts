@@ -1,8 +1,7 @@
 'use strict'
 
-import { join } from 'path'
 import { isMainThread, Worker, workerData } from 'worker_threads'
-import { Callback, Context, defaultOptions, Options, PrintOptions, Result, Results, Tests } from './models'
+import { Callback, Context, defaultOptions, Options, PrintOptions, Result, Results, runnerPath, Tests } from './models'
 import { printResults } from './print'
 
 type PromiseResolver<T> = (value: T) => void
@@ -33,7 +32,7 @@ function scheduleNextTest(context: Context): void {
 function run(context: Context): void {
   const name = context.tests[context.current][0]
 
-  const worker = new Worker(join(__dirname, '../lib/runner.js'), {
+  const worker = new Worker(runnerPath, {
     workerData: {
       path: process.argv[1],
       index: context.current,
@@ -143,5 +142,11 @@ export function cronometro(
   return promise
 }
 
-module.exports = cronometro
-Object.assign(module.exports, exports)
+export default cronometro
+
+// Fix CommonJS exporting
+/* istanbul ignore else */
+if (typeof module !== 'undefined') {
+  module.exports = cronometro
+  Object.assign(module.exports, exports)
+}

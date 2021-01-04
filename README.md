@@ -122,7 +122,7 @@ Output:
 const cronometro = require('cronometro')
 
 const pattern = /[123]/g
-const replacements: { [key: string]: string } = { 1: 'a', 2: 'b', 3: 'c' }
+const replacements = { 1: 'a', 2: 'b', 3: 'c' }
 
 const subject = '123123123123123123123123123123123123123123123123'
 

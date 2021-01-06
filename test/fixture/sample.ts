@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-expect-error
 import { cronometro } from '../../lib'
 import { Results } from '../../src'
 

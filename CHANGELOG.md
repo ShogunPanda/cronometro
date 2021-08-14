@@ -1,3 +1,6 @@
+### 2021-08-14 / 1.0.0
+
+
 ### 2021-08-14 / 1.0.0-beta.1
 
 - feat: Allow main module to export a function.

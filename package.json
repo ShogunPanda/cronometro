@@ -31,8 +31,8 @@
     "build": "tsc -p . && esm-pkg-add-imports-extensions dist",
     "format": "prettier -w src test",
     "lint": "eslint src test",
-    "test": "c8 --reporter=text --reporter=html esm-ts-tap -t 60 --reporter=spec --no-coverage test/*.test.ts",
-    "test:ci": "c8 --reporter=text --reporter=json --check-coverage --branches 90 --functions 90 --lines 90 --statements 90 esm-ts-tap -t 60 --no-color --no-coverage test/*.test.ts",
+    "test": "c8 --reporter=text --reporter=html esm-ts-tap -t 120 --reporter=spec --no-coverage test/*.test.ts",
+    "test:ci": "c8 --reporter=text --reporter=json --check-coverage --branches 90 --functions 90 --lines 90 --statements 90 esm-ts-tap -t 120 --no-color --no-coverage test/*.test.ts",
     "ci": "npm run lint && npm run test:ci",
     "prepublishOnly": "npm run ci",
     "postpublish": "git push origin && git push origin -f --tags"

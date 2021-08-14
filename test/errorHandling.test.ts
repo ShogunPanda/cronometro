@@ -13,18 +13,12 @@ if (!isMainThread) {
         Buffer.alloc(10)
       },
       multiple() {
-        Buffer.alloc(10)
-
-        if (process.argv.length > 0) {
-          throw new Error('FAILED')
-        }
+        throw new Error('FAILED')
       }
     },
     () => false
   )
 } else {
-  t.setTimeout(120000)
-
   t.test('Errored tests handling', async (t: Test) => {
     const results = await cronometro(
       {
@@ -32,19 +26,15 @@ if (!isMainThread) {
           Buffer.alloc(10)
         },
         multiple() {
-          Buffer.alloc(10)
-
-          if (process.argv.length > 0) {
-            throw new Error('FAILED')
-          }
+          throw new Error('FAILED')
         }
       },
       { iterations: 10, print: false }
     )
 
-    t.strictDeepEqual(Object.keys(results), ['single', 'multiple'])
+    t.strictSame(Object.keys(results), ['single', 'multiple'])
 
-    t.true(results.single.success)
+    t.ok(results.single.success)
     t.type(results.single.error, 'undefined')
     t.equal(results.single.size, 10)
     t.type(results.single.min, 'number')
@@ -57,7 +47,7 @@ if (!isMainThread) {
       t.type(results.single.percentiles[percentile.toString()], 'number')
     }
 
-    t.false(results.multiple.success)
+    t.notOk(results.multiple.success)
     t.type(results.multiple.error, Error)
     t.equal(results.multiple.error!.message, 'FAILED')
     t.equal(results.multiple.size, 0)
@@ -66,6 +56,23 @@ if (!isMainThread) {
     t.equal(results.multiple.mean, 0)
     t.equal(results.multiple.stddev, 0)
     t.equal(results.multiple.standardError, 0)
-    t.strictDeepEqual(results.multiple.percentiles, {})
+    t.strictSame(results.multiple.percentiles, {})
+  })
+
+  t.test('Runner cannot be run in main thread', async (t: Test) => {
+    await t.rejects(import('../src/runner'), { message: 'Do not run this file as main script.' })
+  })
+
+  t.only('Runner reports setup errors', async (t: Test) => {
+    const results = await cronometro(
+      {
+        notDefined() {
+          Buffer.alloc(10)
+        }
+      },
+      { iterations: 10, print: false }
+    )
+
+    t.strictSame(Object.keys(results), ['notDefined'])
   })
 }

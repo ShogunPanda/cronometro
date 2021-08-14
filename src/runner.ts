@@ -12,17 +12,17 @@ if (isMainThread) {
 // Register ts-node for TypeScript inclusion
 let chain: Promise<void> = Promise.resolve()
 
+/* c8 ignore start */
 if (workerData.path.endsWith('.ts')) {
   const instance = Symbol.for('ts-node.register.instance')
 
   if (!(instance in process)) {
-    chain =
-      // @ts-expect-error
-      import('ts-node').then(({ register }: TsNodeModule) => {
-        register({ project: process.env.TS_NODE_PROJECT })
-      })
+    chain = import('ts-node').then(({ register }: TsNodeModule) => {
+      register({ project: process.env.TS_NODE_PROJECT })
+    })
   }
 }
+/* c8 ignore stop */
 
 // Require the script to set tests
 chain
@@ -33,8 +33,10 @@ chain
     // Run the worker
     runWorker(workerData, (value: any) => parentPort!.postMessage(value), process.exit)
   })
+  /* c8 ignore start */
   .catch((e: Error) => {
     process.nextTick(() => {
       throw e
     })
   })
+/* c8 ignore stop */

@@ -90,7 +90,7 @@ Each property value is a object with the following properties:
 ## Example (tabular output)
 
 ```javascript
-const cronometro = require('cronometro')
+import cronometro from 'cronometro'
 
 const results = cronometro({
   test1: function () {
@@ -119,7 +119,7 @@ Output:
 ## Example (results structure)
 
 ```javascript
-const cronometro = require('cronometro')
+import cronometro from 'cronometro'
 
 const pattern = /[123]/g
 const replacements = { 1: 'a', 2: 'b', 3: 'c' }

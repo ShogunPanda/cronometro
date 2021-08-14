@@ -21,43 +21,42 @@
     "LICENSE.md",
     "README.md"
   ],
-  "main": "dist/cjs/index.js",
-  "exports": {
-    "require": "./dist/cjs/index.js",
-    "import": "./dist/mjs/index.mjs"
-  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": "./dist/index.js",
   "typings": "types/index.d.ts",
   "types": "types/index.d.ts",
   "scripts": {
-    "lint": "eslint src/*.ts test/*.ts",
-    "test": "tap --reporter=spec --coverage-report=html --coverage-report=text --no-browser test/*.test.ts",
-    "test:ci": "tap --no-color --reporter=spec --coverage-report=json --coverage-report=text --branches 90 --functions 90 --lines 90 --statements 90 test/*.test.ts",
-    "ci": "yarn lint && yarn test:ci",
-    "prebuild": "rm -rf dist types && yarn lint",
-    "build": "tsc -p . && tsc -p tsconfig.modules.json && renamer --find js --replace mjs dist/mjs/* >> /dev/null && jscodeshift -s --extensions=mjs -t node_modules/@cowtech/esm-package-utils dist/mjs/**",
-    "postbuild": "sed -i \"\" -e \"s#__dirname#import.meta.url.replace('file://', '').replace('models.mjs', '')#\" -e \"s#../dist/cjs/runner.js#runner.mjs#\" dist/mjs/models.mjs && sed -i \"\" -e \"s#../dist/cjs/runner.js#./runner.js#\" dist/cjs/models.js",
-    "prepublishOnly": "yarn ci",
+    "prebuild": "rm -rf dist types && npm run lint",
+    "build": "tsc -p . && esm-pkg-add-imports-extensions dist",
+    "format": "prettier -w src test",
+    "lint": "eslint src test",
+    "test": "c8 --reporter=text --reporter=html esm-ts-tap -t 60 --reporter=spec --no-coverage test/*.test.ts",
+    "test:ci": "c8 --reporter=text --reporter=json --check-coverage --branches 90 --functions 90 --lines 90 --statements 90 esm-ts-tap -t 60 --no-color --no-coverage test/*.test.ts",
+    "ci": "npm run lint && npm run test:ci",
+    "prepublishOnly": "npm run ci",
     "postpublish": "git push origin && git push origin -f --tags"
   },
   "dependencies": {
-    "acquerello": "^0.2.0",
+    "acquerello": "^1.0.0",
     "hdr-histogram-js": "^2.0.1",
-    "table": "^6.0.6"
+    "table": "^6.7.1"
   },
   "devDependencies": {
-    "@cowtech/eslint-config": "^7.14.0",
-    "@cowtech/esm-package-utils": "^0.2.0",
-    "@types/node": "^14.14.19",
-    "@types/sinon": "^9.0.10",
-    "@types/table": "^6.0.0",
-    "@types/tap": "^14.10.1",
-    "prettier": "^2.2.1",
+    "@cowtech/eslint-config": "^7.14.5",
+    "@cowtech/esm-package-utils": "^0.9.0",
+    "@types/node": "^16.6.1",
+    "@types/sinon": "^10.0.2",
+    "@types/tap": "^15.0.5",
+    "c8": "^7.8.0",
+    "prettier": "^2.3.2",
     "proxyquire": "^2.1.3",
-    "sinon": "^9.2.2",
-    "tap": "^14.11.0",
-    "typescript": "^4.1.3"
+    "sinon": "^11.1.2",
+    "tap": "^15.0.9",
+    "ts-node": "^10.2.0",
+    "typescript": "^4.3.5"
   },
   "engines": {
-    "node": ">=12.15.0"
+    "node": ">=14.15.0"
   }
 }

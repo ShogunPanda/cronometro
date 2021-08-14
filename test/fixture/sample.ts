@@ -1,5 +1,4 @@
-// @ts-expect-error
-import { cronometro } from '../../lib'
+import cronometro from '../../dist'
 import { Results } from '../../src'
 
 const pattern = /[123]/g
@@ -8,10 +7,11 @@ const replacements: { [key: string]: string } = { 1: 'a', 2: 'b', 3: 'c' }
 const subject =
   '123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123'
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 cronometro(
   {
     single() {
-      subject.replace(pattern, m => replacements[m])
+      subject.replace(pattern, (m: string) => replacements[m])
     },
     multiple() {
       subject.replace(/1/g, 'a').replace(/2/g, 'b').replace(/3/g, 'c')

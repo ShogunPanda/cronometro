@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 
-import { spy } from 'sinon'
+import sinon from 'sinon'
 import t from 'tap'
 import { isMainThread } from 'worker_threads'
 import { cronometro, defaultOptions, percentiles, Results } from '../src'
@@ -13,7 +13,7 @@ function removeStyle(source: string): string {
   return source.replace(/\x1b\[\d+m/g, '')
 }
 
-const loggerSpy = spy()
+const loggerSpy = sinon.spy()
 defaultOptions.iterations = 10
 setLogger(loggerSpy)
 
@@ -33,12 +33,7 @@ if (!isMainThread) {
     () => false
   )
 } else {
-  t.setTimeout(120000)
-
-  t.afterEach((done: () => void) => {
-    loggerSpy.resetHistory()
-    done()
-  })
+  t.afterEach(() => loggerSpy.resetHistory())
 
   t.test('Printing - Default options', (t: Test) => {
     cronometro(
@@ -54,10 +49,10 @@ if (!isMainThread) {
         }
       },
       (err: Error | null, results: Results) => {
-        t.strictEqual(err, null)
-        t.strictDeepEqual(Object.keys(results), ['single', 'multiple', 'error'])
+        t.equal(err, null)
+        t.strictSame(Object.keys(results), ['single', 'multiple', 'error'])
 
-        t.false(results.error.success)
+        t.notOk(results.error.success)
         t.type(results.error.error, Error)
         t.equal(results.error.error!.message, 'FAILED')
         t.equal(results.error.size, 0)
@@ -66,11 +61,11 @@ if (!isMainThread) {
         t.equal(results.error.mean, 0)
         t.equal(results.error.stddev, 0)
         t.equal(results.error.standardError, 0)
-        t.strictDeepEqual(results.error.percentiles, {})
+        t.strictSame(results.error.percentiles, {})
         delete results.error
 
         for (const entry of Object.values(results)) {
-          t.true(entry.success)
+          t.ok(entry.success)
           t.type(entry.error, 'undefined')
           t.equal(entry.size, 10)
           t.type(entry.min, 'number')
@@ -109,7 +104,7 @@ if (!isMainThread) {
       },
       { print: { colors: false } },
       (err: Error | null) => {
-        t.strictEqual(err, null)
+        t.equal(err, null)
 
         const output = loggerSpy.getCall(0).args[0]
 
@@ -136,7 +131,7 @@ if (!isMainThread) {
       },
       { print: { compare: true } },
       (err: Error | null) => {
-        t.strictEqual(err, null)
+        t.equal(err, null)
 
         const output = removeStyle(loggerSpy.getCall(0).args[0])
         t.match(output, /║\s+Slower tests\s+|\s+Samples\s+|\s+Result\s+|\s+Tolerance\s+|\s+Difference with slowest║/)
@@ -167,7 +162,7 @@ if (!isMainThread) {
       },
       { print: { compare: true, compareMode: 'previous' } },
       (err: Error | null) => {
-        t.strictEqual(err, null)
+        t.equal(err, null)
 
         const output = removeStyle(loggerSpy.getCall(0).args[0])
         t.match(

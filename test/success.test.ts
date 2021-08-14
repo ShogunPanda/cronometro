@@ -20,8 +20,6 @@ if (!isMainThread) {
     () => false
   )
 } else {
-  t.setTimeout(120000)
-
   t.only('Collecting results', async (t: Test) => {
     const results = await cronometro(
       {
@@ -36,10 +34,10 @@ if (!isMainThread) {
       { iterations: 10, print: false }
     )
 
-    t.strictDeepEqual(Object.keys(results), ['single', 'multiple'])
+    t.strictSame(Object.keys(results), ['single', 'multiple'])
 
     for (const entry of Object.values(results)) {
-      t.true(entry.success)
+      t.ok(entry.success)
       t.type(entry.error, 'undefined')
       t.equal(entry.size, 10)
       t.type(entry.min, 'number')

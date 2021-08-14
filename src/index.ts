@@ -114,13 +114,11 @@ export function cronometro(
   // Parse and validate options
   const { iterations, errorThreshold, print, warmup } = { ...defaultOptions, ...options }
 
-  // tslint:disable-next-line strict-type-predicates
   if (typeof iterations !== 'number' || iterations < 1) {
     callback(new Error('The iterations option must be a positive number.'))
     return promise
   }
 
-  // tslint:disable-next-line strict-type-predicates
   if (typeof errorThreshold !== 'number' || errorThreshold < 0 || errorThreshold > 100) {
     callback(new Error('The errorThreshold option must be a number between 0 and 100.'))
     return promise
@@ -143,10 +141,3 @@ export function cronometro(
 }
 
 export default cronometro
-
-// Fix CommonJS exporting
-/* istanbul ignore else */
-if (typeof module !== 'undefined') {
-  module.exports = cronometro
-  Object.assign(module.exports, exports)
-}

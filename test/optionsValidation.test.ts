@@ -5,8 +5,6 @@ import { cronometro } from '../src'
 
 type Test = typeof t
 
-t.setTimeout(120000)
-
 t.test('Options validation', async (t: Test) => {
   await t.rejects(
     () =>

@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
-import { spy, stub } from 'sinon'
+import sinon from 'sinon'
 import t from 'tap'
 import { percentiles, Test } from '../src'
 import { runWorker } from '../src/worker'
 
+const { spy, stub } = sinon
 type TapTest = typeof t
-
-t.setTimeout(120000)
 
 t.test('Worker execution - Handle sync functions that succeed', (t: TapTest) => {
   const main = stub()
@@ -24,11 +23,11 @@ t.test('Worker execution - Handle sync functions that succeed', (t: TapTest) => 
     notifier,
     (code: number) => {
       t.equal(code, 0)
-      t.true(main.called)
+      t.ok(main.called)
 
       const result = notifier.getCall(0).args[0]
 
-      t.true(result.success)
+      t.ok(result.success)
       t.type(result.error, 'undefined')
       t.equal(result.size, 1000)
       t.type(result.min, 'number')
@@ -62,11 +61,11 @@ t.test('Worker execution - Handle sync functions that throw errors', (t: TapTest
     notifier,
     (code: number) => {
       t.equal(code, 1)
-      t.true(main.called)
+      t.ok(main.called)
 
       const result = notifier.getCall(0).args[0]
 
-      t.false(result.success)
+      t.notOk(result.success)
       t.type(result.error, Error)
       t.equal(result.error!.message, 'FAILED')
       t.equal(result.size, 0)
@@ -75,7 +74,7 @@ t.test('Worker execution - Handle sync functions that throw errors', (t: TapTest
       t.equal(result.mean, 0)
       t.equal(result.stddev, 0)
       t.equal(result.standardError, 0)
-      t.strictDeepEqual(result.percentiles, {})
+      t.strictSame(result.percentiles, {})
 
       t.end()
     }
@@ -103,11 +102,11 @@ t.test('Worker execution - Handle callback functions that succeed', (t: TapTest)
     notifier,
     (code: number) => {
       t.equal(code, 0)
-      t.true(mainSpy.called)
+      t.ok(mainSpy.called)
 
       const result = notifier.getCall(0).args[0]
 
-      t.true(result.success)
+      t.ok(result.success)
       t.type(result.error, 'undefined')
       t.equal(result.size, 10000)
       t.type(result.min, 'number')
@@ -146,11 +145,11 @@ t.test('Worker execution - Handle callback functions that throw errors', (t: Tap
     notifier,
     (code: number) => {
       t.equal(code, 1)
-      t.true(mainSpy.called)
+      t.ok(mainSpy.called)
 
       const result = notifier.getCall(0).args[0]
 
-      t.false(result.success)
+      t.notOk(result.success)
       t.type(result.error, Error)
       t.equal(result.error!.message, 'FAILED')
       t.equal(result.size, 0)
@@ -159,7 +158,7 @@ t.test('Worker execution - Handle callback functions that throw errors', (t: Tap
       t.equal(result.mean, 0)
       t.equal(result.stddev, 0)
       t.equal(result.standardError, 0)
-      t.strictDeepEqual(result.percentiles, {})
+      t.strictSame(result.percentiles, {})
 
       t.end()
     }
@@ -183,11 +182,11 @@ t.test('Worker execution - Handle promise functions that resolve', (t: TapTest) 
     notifier,
     (code: number) => {
       t.equal(code, 0)
-      t.true(main.called)
+      t.ok(main.called)
 
       const result = notifier.getCall(0).args[0]
 
-      t.true(result.success)
+      t.ok(result.success)
       t.type(result.error, 'undefined')
       t.equal(result.size, 5)
       t.type(result.min, 'number')
@@ -222,11 +221,11 @@ t.test('Worker execution - Handle promise functions that reject', (t: TapTest) =
     notifier,
     (code: number) => {
       t.equal(code, 1)
-      t.true(main.called)
+      t.ok(main.called)
 
       const result = notifier.getCall(0).args[0]
 
-      t.false(result.success)
+      t.notOk(result.success)
       t.type(result.error, Error)
       t.equal(result.error!.message, 'FAILED')
       t.equal(result.size, 0)
@@ -235,7 +234,7 @@ t.test('Worker execution - Handle promise functions that reject', (t: TapTest) =
       t.equal(result.mean, 0)
       t.equal(result.stddev, 0)
       t.equal(result.standardError, 0)
-      t.strictDeepEqual(result.percentiles, {})
+      t.strictSame(result.percentiles, {})
 
       t.end()
     }
@@ -264,7 +263,7 @@ t.test('Worker execution - Handle warmup mode enabled', (t: TapTest) => {
 
       const result = notifier.getCall(0).args[0]
 
-      t.true(result.success)
+      t.ok(result.success)
       t.type(result.error, 'undefined')
       t.equal(result.size, 5)
       t.type(result.min, 'number')
@@ -304,7 +303,7 @@ t.test('Worker execution - Handle warmup mode disabled', (t: TapTest) => {
 
       const result = notifier.getCall(0).args[0]
 
-      t.true(result.success)
+      t.ok(result.success)
       t.type(result.error, 'undefined')
       t.equal(result.size, 5)
       t.type(result.min, 'number')
@@ -351,12 +350,12 @@ t.test('Worker setup - Handle callback before functions', (t: TapTest) => {
     (code: number) => {
       t.equal(code, 0)
       t.equal(setup.callCount, 1)
-      t.true(main.called)
+      t.ok(main.called)
       t.equal(notifier.callCount, 1)
 
       const result = notifier.getCall(0).args[0]
 
-      t.true(result.success)
+      t.ok(result.success)
       t.type(result.error, 'undefined')
       t.equal(result.size, 1000)
       t.type(result.min, 'number')
@@ -400,11 +399,11 @@ t.test('Worker setup - Handle callback before functions that throw errors', (t: 
     notifier,
     (code: number) => {
       t.equal(code, 1)
-      t.false(main.called)
+      t.notOk(main.called)
 
       const result = notifier.getCall(0).args[0]
 
-      t.false(result.success)
+      t.notOk(result.success)
       t.type(result.error, Error)
       t.equal(result.error!.message, 'FAILED')
       t.equal(result.size, 0)
@@ -413,7 +412,7 @@ t.test('Worker setup - Handle callback before functions that throw errors', (t: 
       t.equal(result.mean, 0)
       t.equal(result.stddev, 0)
       t.equal(result.standardError, 0)
-      t.strictDeepEqual(result.percentiles, {})
+      t.strictSame(result.percentiles, {})
 
       t.end()
     }
@@ -448,12 +447,12 @@ t.test('Worker setup - Handle promise before functions that resolve', (t: TapTes
     (code: number) => {
       t.equal(code, 0)
       t.equal(setup.callCount, 1)
-      t.true(main.called)
+      t.ok(main.called)
       t.equal(notifier.callCount, 1)
 
       const result = notifier.getCall(0).args[0]
 
-      t.true(result.success)
+      t.ok(result.success)
       t.type(result.error, 'undefined')
       t.equal(result.size, 1000)
       t.type(result.min, 'number')
@@ -497,11 +496,11 @@ t.test('Worker setup - Handle promise before functions that reject', (t: TapTest
     notifier,
     (code: number) => {
       t.equal(code, 1)
-      t.false(main.called)
+      t.notOk(main.called)
 
       const result = notifier.getCall(0).args[0]
 
-      t.false(result.success)
+      t.notOk(result.success)
       t.type(result.error, Error)
       t.equal(result.error!.message, 'FAILED')
       t.equal(result.size, 0)
@@ -510,7 +509,7 @@ t.test('Worker setup - Handle promise before functions that reject', (t: TapTest
       t.equal(result.mean, 0)
       t.equal(result.stddev, 0)
       t.equal(result.standardError, 0)
-      t.strictDeepEqual(result.percentiles, {})
+      t.strictSame(result.percentiles, {})
 
       t.end()
     }
@@ -546,12 +545,12 @@ t.test('Worker setup - Handle callback after functions', (t: TapTest) => {
     (code: number) => {
       t.equal(code, 0)
       t.equal(setup.callCount, 1)
-      t.true(main.called)
+      t.ok(main.called)
       t.equal(notifier.callCount, 1)
 
       const result = notifier.getCall(0).args[0]
 
-      t.true(result.success)
+      t.ok(result.success)
       t.type(result.error, 'undefined')
       t.equal(result.size, 1000)
       t.type(result.min, 'number')
@@ -595,11 +594,11 @@ t.test('Worker setup - Handle callback after functions that throw errors', (t: T
     notifier,
     (code: number) => {
       t.equal(code, 1)
-      t.true(main.called)
+      t.ok(main.called)
 
       const result = notifier.getCall(0).args[0]
 
-      t.false(result.success)
+      t.notOk(result.success)
       t.type(result.error, Error)
       t.equal(result.error!.message, 'FAILED')
       t.equal(result.size, 0)
@@ -608,7 +607,7 @@ t.test('Worker setup - Handle callback after functions that throw errors', (t: T
       t.equal(result.mean, 0)
       t.equal(result.stddev, 0)
       t.equal(result.standardError, 0)
-      t.strictDeepEqual(result.percentiles, {})
+      t.strictSame(result.percentiles, {})
 
       t.end()
     }
@@ -643,12 +642,12 @@ t.test('Worker setup - Handle promise after functions that resolve', (t: TapTest
     (code: number) => {
       t.equal(code, 0)
       t.equal(setup.callCount, 1)
-      t.true(main.called)
+      t.ok(main.called)
       t.equal(notifier.callCount, 1)
 
       const result = notifier.getCall(0).args[0]
 
-      t.true(result.success)
+      t.ok(result.success)
       t.type(result.error, 'undefined')
       t.equal(result.size, 1000)
       t.type(result.min, 'number')
@@ -692,11 +691,11 @@ t.test('Worker setup - Handle promise after functions that reject', (t: TapTest)
     notifier,
     (code: number) => {
       t.equal(code, 1)
-      t.true(main.called)
+      t.ok(main.called)
 
       const result = notifier.getCall(0).args[0]
 
-      t.false(result.success)
+      t.notOk(result.success)
       t.type(result.error, Error)
       t.equal(result.error!.message, 'FAILED')
       t.equal(result.size, 0)
@@ -705,14 +704,14 @@ t.test('Worker setup - Handle promise after functions that reject', (t: TapTest)
       t.equal(result.mean, 0)
       t.equal(result.stddev, 0)
       t.equal(result.standardError, 0)
-      t.strictDeepEqual(result.percentiles, {})
+      t.strictSame(result.percentiles, {})
 
       t.end()
     }
   )
 })
 
-t.test('Worker execution - Handle empty tets', (t: TapTest) => {
+t.test('Worker execution - Handle empty tests', (t: TapTest) => {
   const notifier = spy()
 
   runWorker(
@@ -730,7 +729,7 @@ t.test('Worker execution - Handle empty tets', (t: TapTest) => {
 
       const result = notifier.getCall(0).args[0]
 
-      t.true(result.success)
+      t.ok(result.success)
       t.type(result.error, 'undefined')
       t.equal(result.size, 1000)
       t.type(result.min, 'number')

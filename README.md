@@ -39,6 +39,8 @@ Inside worker threads, the cronometro function invocation will return no value a
 
 You can use `isMainThread` from Worker Threads API to check in which environment the script is running.
 
+If your main module returns a function, cronometro will execute it before running tests. The function can also return a promise and that will be awaited.
+
 ## Usage
 
 To run a benchmark, simply call the `cronometro` function with the set of tests you want to run, then optionally provide a options object and a Node's style callback.

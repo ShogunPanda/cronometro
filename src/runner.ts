@@ -22,18 +22,23 @@ if (workerData.path.endsWith('.ts')) {
     })
   }
 }
-/* c8 ignore stop */
 
 // Require the script to set tests
 chain
   .then(() => {
     return import(workerData.path)
   })
+  .then((module: any) => {
+    if (typeof module === 'function') {
+      return module()
+    } else if (typeof module.default === 'function') {
+      return module.default()
+    }
+  })
   .then(() => {
     // Run the worker
     runWorker(workerData, (value: any) => parentPort!.postMessage(value), process.exit)
   })
-  /* c8 ignore start */
   .catch((e: Error) => {
     process.nextTick(() => {
       throw e

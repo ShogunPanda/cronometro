@@ -1,3 +1,9 @@
+### 2021-08-14 / 1.0.0-beta.0
+
+- chore: Increase tests timeout.
+- feat: Only export as ESM.
+- chore: Updated directive.
+
 ### 2021-01-04 / 0.8.0
 
 - feat: Export as ESM.

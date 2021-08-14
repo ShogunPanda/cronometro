@@ -1,7 +1,6 @@
 import { build as buildHistogram } from 'hdr-histogram-js'
 import { Percentiles, percentiles, Result, SetupFunction, TestContext, TestFunction, WorkerContext } from './models'
 
-/* istanbul ignore next */
 function noOp(): void {
   // No-op
 }
@@ -91,12 +90,10 @@ function runTestIteration(context: TestContext): void {
     }
   } catch (e) {
     // If a error was thrown, only handle if the original function length is 0, which means it's a sync error, otherwise propagate
-    /* istanbul ignore else */
     if (context.test.length === 0) {
       return context.handler(e)
     }
 
-    /* istanbul ignore next */
     throw e
   }
 }

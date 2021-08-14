@@ -79,7 +79,6 @@ export function cronometro(
   cb?: Callback
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
 ): Promise<Results> | void {
-  /* istanbul ignore next */
   if (!isMainThread) {
     workerData.tests = Object.entries(tests)
     return

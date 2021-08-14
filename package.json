@@ -1,6 +1,6 @@
 {
   "name": "cronometro",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0",
   "description": "Simple benchmarking suite powered by HDR histograms.",
   "homepage": "https://sw.cowtech.it/cronometro",
   "repository": "github:ShogunPanda/cronometro",

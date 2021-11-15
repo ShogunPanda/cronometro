@@ -1,9 +1,9 @@
 # cronometro
 
-[![Package Version](https://img.shields.io/npm/v/cronometro.svg)](https://npm.im/cronometro)
-[![Dependency Status](https://img.shields.io/david/ShogunPanda/cronometro)](https://david-dm.org/ShogunPanda/cronometro)
+[![Version](https://img.shields.io/npm/v/cronometro.svg)](https://npm.im/cronometro)
+[![Dependencies](https://img.shields.io/librariesio/release/npm/cronometro)](https://libraries.io/npm/cronometro)
 [![Build](https://github.com/ShogunPanda/cronometro/workflows/CI/badge.svg)](https://github.com/ShogunPanda/cronometro/actions?query=workflow%3ACI)
-[![Code Coverage](https://img.shields.io/codecov/c/gh/ShogunPanda/cronometro?token=LhUiSgWHoI)](https://codecov.io/gh/ShogunPanda/cronometro)
+[![Coverage](https://img.shields.io/codecov/c/gh/ShogunPanda/cronometro?token=LhUiSgWHoI)](https://codecov.io/gh/ShogunPanda/cronometro)
 
 Simple benchmarking suite powered by HDR histograms.
 

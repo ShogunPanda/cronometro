@@ -1,3 +1,12 @@
+### 2021-11-16 / 1.0.1
+
+- fix: Added ESM note in the README.md
+- chore: Allow manual CI triggering.
+- chore: Updated badges.
+- fix: Fixed Typescript configuration.
+- chore: Renamed test files.
+- chore: Removed useless comments.
+
 ### 2021-08-14 / 1.0.0
 
 

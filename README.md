@@ -17,6 +17,10 @@ Cronometro uses [worker_threads](https://nodejs.org/dist/latest-v12.x/docs/api/w
 
 Only Node 12.x and above are supported.
 
+This package only supports to be directly imported in a ESM context.
+
+For informations on how to use it in a CommonJS context, please check [this page](https://gist.github.com/ShogunPanda/fe98fd23d77cdfb918010dbc42f4504d).
+
 ### Script invocation
 
 The main script which invokes cronometro must be executable without command line arguments, as it is how it will be called within a Worker Thread.

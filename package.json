@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "@cowtech/eslint-config": "^7.14.5",
-    "@cowtech/esm-package-utils": "^0.9.0",
+    "@cowtech/esm-package-utils": "^0.9.1",
     "@types/node": "^16.6.1",
     "@types/sinon": "^10.0.2",
     "@types/tap": "^15.0.5",

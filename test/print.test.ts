@@ -3,10 +3,8 @@
 import sinon from 'sinon'
 import t from 'tap'
 import { isMainThread } from 'worker_threads'
-import { cronometro, defaultOptions, percentiles, Results } from '../src'
+import { cronometro, defaultOptions, percentiles } from '../src'
 import { setLogger } from '../src/print'
-
-type Test = typeof t
 
 function removeStyle(source: string): string {
   // eslint-disable-next-line no-control-regex
@@ -35,7 +33,7 @@ if (!isMainThread) {
 } else {
   t.afterEach(() => loggerSpy.resetHistory())
 
-  t.test('Printing - Default options', (t: Test) => {
+  t.test('Printing - Default options', t => {
     cronometro(
       {
         single() {
@@ -48,7 +46,7 @@ if (!isMainThread) {
           throw new Error('FAILED')
         }
       },
-      (err: Error | null, results: Results) => {
+      (err, results) => {
         t.equal(err, null)
         t.strictSame(Object.keys(results), ['single', 'multiple', 'error'])
 
@@ -89,7 +87,7 @@ if (!isMainThread) {
     )
   })
 
-  t.test('Printing - No colors', (t: Test) => {
+  t.test('Printing - No colors', t => {
     cronometro(
       {
         single() {
@@ -103,7 +101,7 @@ if (!isMainThread) {
         }
       },
       { print: { colors: false } },
-      (err: Error | null) => {
+      err => {
         t.equal(err, null)
 
         const output = loggerSpy.getCall(0).args[0]
@@ -116,7 +114,7 @@ if (!isMainThread) {
     )
   })
 
-  t.test('Printing - Base compare', (t: Test) => {
+  t.test('Printing - Base compare', t => {
     cronometro(
       {
         single() {
@@ -130,7 +128,7 @@ if (!isMainThread) {
         }
       },
       { print: { compare: true } },
-      (err: Error | null) => {
+      err => {
         t.equal(err, null)
 
         const output = removeStyle(loggerSpy.getCall(0).args[0])
@@ -147,7 +145,7 @@ if (!isMainThread) {
     )
   })
 
-  t.test('Printing - Previous compare', (t: Test) => {
+  t.test('Printing - Previous compare', t => {
     cronometro(
       {
         single() {
@@ -161,7 +159,7 @@ if (!isMainThread) {
         }
       },
       { print: { compare: true, compareMode: 'previous' } },
-      (err: Error | null) => {
+      err => {
         t.equal(err, null)
 
         const output = removeStyle(loggerSpy.getCall(0).args[0])

@@ -4,8 +4,6 @@ import t from 'tap'
 import { isMainThread } from 'worker_threads'
 import { cronometro, percentiles } from '../src'
 
-type Test = typeof t
-
 if (!isMainThread) {
   cronometro(
     {
@@ -19,7 +17,7 @@ if (!isMainThread) {
     () => false
   )
 } else {
-  t.test('Errored tests handling', async (t: Test) => {
+  t.test('Errored tests handling', async t => {
     const results = await cronometro(
       {
         single() {
@@ -59,11 +57,11 @@ if (!isMainThread) {
     t.strictSame(results.multiple.percentiles, {})
   })
 
-  t.test('Runner cannot be run in main thread', async (t: Test) => {
+  t.test('Runner cannot be run in main thread', async t => {
     await t.rejects(import('../src/runner'), { message: 'Do not run this file as main script.' })
   })
 
-  t.only('Runner reports setup errors', async (t: Test) => {
+  t.only('Runner reports setup errors', async t => {
     const results = await cronometro(
       {
         notDefined() {

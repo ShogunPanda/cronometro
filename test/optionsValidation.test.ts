@@ -3,9 +3,7 @@
 import t from 'tap'
 import { cronometro } from '../src'
 
-type Test = typeof t
-
-t.test('Options validation', async (t: Test) => {
+t.test('Options validation', async t => {
   await t.rejects(
     () =>
       cronometro(
@@ -34,7 +32,7 @@ t.test('Options validation', async (t: Test) => {
       }
     },
     { errorThreshold: -1 },
-    (err: Error | null) => {
+    err => {
       t.type(err, 'Error')
       t.equal(err!.message, 'The errorThreshold option must be a number between 0 and 100.')
     }

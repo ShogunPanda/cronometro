@@ -5,9 +5,8 @@ import { percentiles, Test } from '../src'
 import { runWorker } from '../src/worker'
 
 const { spy, stub } = sinon
-type TapTest = typeof t
 
-t.test('Worker execution - Handle sync functions that succeed', (t: TapTest) => {
+t.test('Worker execution - Handle sync functions that succeed', t => {
   const main = stub()
   const notifier = spy()
 
@@ -21,7 +20,7 @@ t.test('Worker execution - Handle sync functions that succeed', (t: TapTest) => 
       errorThreshold: 100
     },
     notifier,
-    (code: number) => {
+    code => {
       t.equal(code, 0)
       t.ok(main.called)
 
@@ -45,7 +44,7 @@ t.test('Worker execution - Handle sync functions that succeed', (t: TapTest) => 
   )
 })
 
-t.test('Worker execution - Handle sync functions that throw errors', (t: TapTest) => {
+t.test('Worker execution - Handle sync functions that throw errors', t => {
   const main = stub().throws(new Error('FAILED'))
   const notifier = spy()
 
@@ -59,7 +58,7 @@ t.test('Worker execution - Handle sync functions that throw errors', (t: TapTest
       errorThreshold: 100
     },
     notifier,
-    (code: number) => {
+    code => {
       t.equal(code, 1)
       t.ok(main.called)
 
@@ -81,7 +80,7 @@ t.test('Worker execution - Handle sync functions that throw errors', (t: TapTest
   )
 })
 
-t.test('Worker execution - Handle callback functions that succeed', (t: TapTest) => {
+t.test('Worker execution - Handle callback functions that succeed', t => {
   function main(cb: (err?: Error) => void): void {
     cb()
   }
@@ -100,7 +99,7 @@ t.test('Worker execution - Handle callback functions that succeed', (t: TapTest)
       errorThreshold: 1e-9
     },
     notifier,
-    (code: number) => {
+    code => {
       t.equal(code, 0)
       t.ok(mainSpy.called)
 
@@ -124,7 +123,7 @@ t.test('Worker execution - Handle callback functions that succeed', (t: TapTest)
   )
 })
 
-t.test('Worker execution - Handle callback functions that throw errors', (t: TapTest) => {
+t.test('Worker execution - Handle callback functions that throw errors', t => {
   function main(cb: (err?: Error) => void): void {
     cb(new Error('FAILED'))
   }
@@ -143,7 +142,7 @@ t.test('Worker execution - Handle callback functions that throw errors', (t: Tap
       errorThreshold: 0
     },
     notifier,
-    (code: number) => {
+    code => {
       t.equal(code, 1)
       t.ok(mainSpy.called)
 
@@ -165,7 +164,7 @@ t.test('Worker execution - Handle callback functions that throw errors', (t: Tap
   )
 })
 
-t.test('Worker execution - Handle promise functions that resolve', (t: TapTest) => {
+t.test('Worker execution - Handle promise functions that resolve', t => {
   const main = stub().resolves()
   const notifier = spy()
 
@@ -180,7 +179,7 @@ t.test('Worker execution - Handle promise functions that resolve', (t: TapTest) 
       errorThreshold: 0
     },
     notifier,
-    (code: number) => {
+    code => {
       t.equal(code, 0)
       t.ok(main.called)
 
@@ -204,7 +203,7 @@ t.test('Worker execution - Handle promise functions that resolve', (t: TapTest) 
   )
 })
 
-t.test('Worker execution - Handle promise functions that reject', (t: TapTest) => {
+t.test('Worker execution - Handle promise functions that reject', t => {
   const main = stub().rejects(new Error('FAILED'))
   const notifier = spy()
 
@@ -219,7 +218,7 @@ t.test('Worker execution - Handle promise functions that reject', (t: TapTest) =
       errorThreshold: 0
     },
     notifier,
-    (code: number) => {
+    code => {
       t.equal(code, 1)
       t.ok(main.called)
 
@@ -241,7 +240,7 @@ t.test('Worker execution - Handle promise functions that reject', (t: TapTest) =
   )
 })
 
-t.test('Worker execution - Handle warmup mode enabled', (t: TapTest) => {
+t.test('Worker execution - Handle warmup mode enabled', t => {
   const main = stub()
   const notifier = spy()
 
@@ -256,7 +255,7 @@ t.test('Worker execution - Handle warmup mode enabled', (t: TapTest) => {
       errorThreshold: 0
     },
     notifier,
-    (code: number) => {
+    code => {
       t.equal(code, 0)
       t.equal(main.callCount, 10)
       t.equal(notifier.callCount, 1)
@@ -281,7 +280,7 @@ t.test('Worker execution - Handle warmup mode enabled', (t: TapTest) => {
   )
 })
 
-t.test('Worker execution - Handle warmup mode disabled', (t: TapTest) => {
+t.test('Worker execution - Handle warmup mode disabled', t => {
   const main = stub()
   const notifier = spy()
 
@@ -296,7 +295,7 @@ t.test('Worker execution - Handle warmup mode disabled', (t: TapTest) => {
       errorThreshold: 0
     },
     notifier,
-    (code: number) => {
+    code => {
       t.equal(code, 0)
       t.equal(main.callCount, 5)
       t.equal(notifier.callCount, 1)
@@ -321,7 +320,7 @@ t.test('Worker execution - Handle warmup mode disabled', (t: TapTest) => {
   )
 })
 
-t.test('Worker setup - Handle callback before functions', (t: TapTest) => {
+t.test('Worker setup - Handle callback before functions', t => {
   const main = stub()
   const setup = spy()
   const notifier = spy()
@@ -347,7 +346,7 @@ t.test('Worker setup - Handle callback before functions', (t: TapTest) => {
       errorThreshold: 100
     },
     notifier,
-    (code: number) => {
+    code => {
       t.equal(code, 0)
       t.equal(setup.callCount, 1)
       t.ok(main.called)
@@ -373,7 +372,7 @@ t.test('Worker setup - Handle callback before functions', (t: TapTest) => {
   )
 })
 
-t.test('Worker setup - Handle callback before functions that throw errors', (t: TapTest) => {
+t.test('Worker setup - Handle callback before functions that throw errors', t => {
   const main = stub()
   const notifier = spy()
 
@@ -397,7 +396,7 @@ t.test('Worker setup - Handle callback before functions that throw errors', (t: 
       errorThreshold: 100
     },
     notifier,
-    (code: number) => {
+    code => {
       t.equal(code, 1)
       t.notOk(main.called)
 
@@ -419,7 +418,7 @@ t.test('Worker setup - Handle callback before functions that throw errors', (t: 
   )
 })
 
-t.test('Worker setup - Handle promise before functions that resolve', (t: TapTest) => {
+t.test('Worker setup - Handle promise before functions that resolve', t => {
   const main = stub()
   const setup = spy()
   const notifier = spy()
@@ -432,8 +431,9 @@ t.test('Worker setup - Handle promise before functions that resolve', (t: TapTes
           'main',
           {
             test: main,
-            async before(): Promise<void> {
+            before() {
               setup()
+              return Promise.resolve()
             }
           }
         ]
@@ -444,7 +444,7 @@ t.test('Worker setup - Handle promise before functions that resolve', (t: TapTes
       errorThreshold: 100
     },
     notifier,
-    (code: number) => {
+    code => {
       t.equal(code, 0)
       t.equal(setup.callCount, 1)
       t.ok(main.called)
@@ -470,7 +470,7 @@ t.test('Worker setup - Handle promise before functions that resolve', (t: TapTes
   )
 })
 
-t.test('Worker setup - Handle promise before functions that reject', (t: TapTest) => {
+t.test('Worker setup - Handle promise before functions that reject', t => {
   const main = stub()
   const notifier = spy()
 
@@ -482,8 +482,8 @@ t.test('Worker setup - Handle promise before functions that reject', (t: TapTest
           'main',
           {
             test: main,
-            async before(): Promise<void> {
-              throw new Error('FAILED')
+            before() {
+              return Promise.reject(new Error('FAILED'))
             }
           }
         ]
@@ -494,7 +494,7 @@ t.test('Worker setup - Handle promise before functions that reject', (t: TapTest
       errorThreshold: 100
     },
     notifier,
-    (code: number) => {
+    code => {
       t.equal(code, 1)
       t.notOk(main.called)
 
@@ -516,7 +516,7 @@ t.test('Worker setup - Handle promise before functions that reject', (t: TapTest
   )
 })
 
-t.test('Worker setup - Handle callback after functions', (t: TapTest) => {
+t.test('Worker setup - Handle callback after functions', t => {
   const main = stub()
   const setup = spy()
   const notifier = spy()
@@ -542,7 +542,7 @@ t.test('Worker setup - Handle callback after functions', (t: TapTest) => {
       errorThreshold: 100
     },
     notifier,
-    (code: number) => {
+    code => {
       t.equal(code, 0)
       t.equal(setup.callCount, 1)
       t.ok(main.called)
@@ -568,7 +568,7 @@ t.test('Worker setup - Handle callback after functions', (t: TapTest) => {
   )
 })
 
-t.test('Worker setup - Handle callback after functions that throw errors', (t: TapTest) => {
+t.test('Worker setup - Handle callback after functions that throw errors', t => {
   const main = stub()
   const notifier = spy()
 
@@ -592,7 +592,7 @@ t.test('Worker setup - Handle callback after functions that throw errors', (t: T
       errorThreshold: 100
     },
     notifier,
-    (code: number) => {
+    code => {
       t.equal(code, 1)
       t.ok(main.called)
 
@@ -614,7 +614,7 @@ t.test('Worker setup - Handle callback after functions that throw errors', (t: T
   )
 })
 
-t.test('Worker setup - Handle promise after functions that resolve', (t: TapTest) => {
+t.test('Worker setup - Handle promise after functions that resolve', t => {
   const main = stub()
   const setup = spy()
   const notifier = spy()
@@ -627,8 +627,9 @@ t.test('Worker setup - Handle promise after functions that resolve', (t: TapTest
           'main',
           {
             test: main,
-            async after(): Promise<void> {
+            after() {
               setup()
+              return Promise.resolve()
             }
           }
         ]
@@ -639,7 +640,7 @@ t.test('Worker setup - Handle promise after functions that resolve', (t: TapTest
       errorThreshold: 100
     },
     notifier,
-    (code: number) => {
+    code => {
       t.equal(code, 0)
       t.equal(setup.callCount, 1)
       t.ok(main.called)
@@ -665,7 +666,7 @@ t.test('Worker setup - Handle promise after functions that resolve', (t: TapTest
   )
 })
 
-t.test('Worker setup - Handle promise after functions that reject', (t: TapTest) => {
+t.test('Worker setup - Handle promise after functions that reject', t => {
   const main = stub()
   const notifier = spy()
 
@@ -677,8 +678,8 @@ t.test('Worker setup - Handle promise after functions that reject', (t: TapTest)
           'main',
           {
             test: main,
-            async after(): Promise<void> {
-              throw new Error('FAILED')
+            after() {
+              return Promise.reject(new Error('FAILED'))
             }
           }
         ]
@@ -689,7 +690,7 @@ t.test('Worker setup - Handle promise after functions that reject', (t: TapTest)
       errorThreshold: 100
     },
     notifier,
-    (code: number) => {
+    code => {
       t.equal(code, 1)
       t.ok(main.called)
 
@@ -711,7 +712,7 @@ t.test('Worker setup - Handle promise after functions that reject', (t: TapTest)
   )
 })
 
-t.test('Worker execution - Handle empty tests', (t: TapTest) => {
+t.test('Worker execution - Handle empty tests', t => {
   const notifier = spy()
 
   runWorker(
@@ -724,7 +725,7 @@ t.test('Worker execution - Handle empty tests', (t: TapTest) => {
       errorThreshold: 100
     },
     notifier,
-    (code: number) => {
+    code => {
       t.equal(code, 0)
 
       const result = notifier.getCall(0).args[0]

@@ -4,10 +4,8 @@ import t from 'tap'
 import { isMainThread } from 'worker_threads'
 import { cronometro, percentiles } from '../src'
 
-type Test = typeof t
-
 async function main(): Promise<void> {
-  await new Promise((resolve: (value: unknown) => void) => setTimeout(resolve, 100))
+  await new Promise(resolve => setTimeout(resolve, 100))
 
   if (!isMainThread) {
     cronometro(
@@ -23,7 +21,7 @@ async function main(): Promise<void> {
       () => false
     )
   } else {
-    t.only('Collecting results', async (t: Test) => {
+    t.only('Collecting results', async t => {
       const results = await cronometro(
         {
           single() {

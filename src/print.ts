@@ -1,6 +1,6 @@
 import { clean, colorize } from 'acquerello'
 import { table } from 'table'
-import { Result, Results } from './models'
+import { Results } from './models'
 
 const styles = ['red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white', 'gray']
 
@@ -29,8 +29,8 @@ export function printResults(results: Results, colors: boolean, compare: boolean
   let standardErrorPadding = 0
 
   const entries: Array<PrintInfo> = Object.entries(results)
-    .sort((a: [string, Result], b: [string, Result]) => (!a[1].success ? -1 : b[1].mean - a[1].mean))
-    .map(([name, result]: [string, Result]) => {
+    .sort((a, b) => (!a[1].success ? -1 : b[1].mean - a[1].mean))
+    .map(([name, result]) => {
       if (!result.success) {
         return {
           name,
@@ -72,7 +72,7 @@ export function printResults(results: Results, colors: boolean, compare: boolean
 
   let currentColor = 0
 
-  const rows: Array<Array<string>> = entries.map((entry: PrintInfo) => {
+  const rows: Array<Array<string>> = entries.map(entry => {
     if (entry.error) {
       const row = [
         styler(`{{gray}}${entry.name}{{-}}`),

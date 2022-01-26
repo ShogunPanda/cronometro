@@ -4,8 +4,6 @@ import t from 'tap'
 import { isMainThread } from 'worker_threads'
 import { cronometro, percentiles } from '../src'
 
-type Test = typeof t
-
 if (!isMainThread) {
   cronometro(
     {
@@ -20,7 +18,7 @@ if (!isMainThread) {
     () => false
   )
 } else {
-  t.only('Collecting results', async (t: Test) => {
+  t.only('Collecting results', async t => {
     const results = await cronometro(
       {
         single() {

@@ -4,8 +4,6 @@ import t from 'tap'
 import { isMainThread } from 'worker_threads'
 import { Callback, cronometro, percentiles } from '../src'
 
-type Test = typeof t
-
 if (!isMainThread) {
   cronometro(
     {
@@ -23,7 +21,7 @@ if (!isMainThread) {
     () => false
   )
 } else {
-  t.test('Unhandled errored tests handling', async (t: Test) => {
+  t.test('Unhandled errored tests handling', async t => {
     const results = await cronometro(
       {
         single() {

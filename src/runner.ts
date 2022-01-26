@@ -1,10 +1,6 @@
 import { isMainThread, parentPort, workerData } from 'worker_threads'
 import { runWorker } from './worker'
 
-interface TsNodeModule {
-  register: (options: object) => void
-}
-
 if (isMainThread) {
   throw new Error('Do not run this file as main script.')
 }
@@ -17,7 +13,7 @@ if (workerData.path.endsWith('.ts')) {
   const instance = Symbol.for('ts-node.register.instance')
 
   if (!(instance in process)) {
-    chain = import('ts-node').then(({ register }: TsNodeModule) => {
+    chain = import('ts-node').then(({ register }) => {
       register({ project: process.env.TS_NODE_PROJECT })
     })
   }
@@ -28,7 +24,7 @@ chain
   .then(() => {
     return import(workerData.path)
   })
-  .then((module: any) => {
+  .then(module => {
     if (typeof module === 'function') {
       return module()
     } else if (typeof module.default === 'function') {
@@ -37,9 +33,9 @@ chain
   })
   .then(() => {
     // Run the worker
-    runWorker(workerData, (value: any) => parentPort!.postMessage(value), process.exit)
+    runWorker(workerData, value => parentPort!.postMessage(value), process.exit)
   })
-  .catch((e: Error) => {
+  .catch(e => {
     process.nextTick(() => {
       throw e
     })

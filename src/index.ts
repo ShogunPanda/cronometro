@@ -1,7 +1,7 @@
 'use strict'
 
 import { isMainThread, Worker, workerData } from 'worker_threads'
-import { Callback, Context, defaultOptions, Options, PrintOptions, Result, Results, runnerPath, Tests } from './models'
+import { Callback, Context, defaultOptions, Options, PrintOptions, Results, runnerPath, Tests } from './models'
 import { printResults } from './print'
 
 type PromiseResolver<T> = (value: T) => void
@@ -42,7 +42,7 @@ function run(context: Context): void {
     }
   })
 
-  worker.on('error', (error: Error) => {
+  worker.on('error', error => {
     context.results[name] = {
       success: false,
       error,
@@ -60,7 +60,7 @@ function run(context: Context): void {
     scheduleNextTest(context)
   })
 
-  worker.on('message', (result: Result) => {
+  worker.on('message', result => {
     context.results[name] = result
     context.current++
 
@@ -96,7 +96,7 @@ export function cronometro(
   let callback = cb as (err: Error | null, results?: Results) => void
 
   if (!callback) {
-    promise = new Promise<Results>((resolve: PromiseResolver<Results>, reject: PromiseRejecter) => {
+    promise = new Promise<Results>((resolve, reject) => {
       promiseResolve = resolve
       promiseReject = reject
     })

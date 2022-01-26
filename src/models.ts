@@ -29,7 +29,7 @@ export interface Test {
   after?: SetupFunction
 }
 
-export type Callback = ((err: Error | null) => void) | ((err: null, results: Results) => any)
+export type Callback = (err: Error | null, results: Results) => any
 
 export interface Percentiles {
   [key: string]: number

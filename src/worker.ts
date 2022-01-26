@@ -63,7 +63,7 @@ function handleTestIteration(context: TestContext, error?: Error | null): void {
       max: histogram.maxValue,
       mean: histogram.mean,
       stddev: stdDev,
-      percentiles: percentiles.reduce((accu: Percentiles, percentile: number) => {
+      percentiles: percentiles.reduce((accu: Percentiles, percentile) => {
         accu[percentile] = histogram.getValueAtPercentile(percentile)
         return accu
       }, {}),

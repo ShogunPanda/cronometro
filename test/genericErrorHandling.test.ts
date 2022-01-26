@@ -4,12 +4,10 @@ import t from 'tap'
 import { isMainThread } from 'worker_threads'
 import { cronometro } from '../src'
 
-type Test = typeof t
-
 if (!isMainThread) {
   cronometro(undefined as any, () => false)
 } else {
-  t.test('Generic error handling', async (t: Test) => {
+  t.test('Generic error handling', async t => {
     const results = await cronometro(
       {
         single() {

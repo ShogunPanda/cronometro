@@ -1,6 +1,6 @@
-import cronometro from '../../dist'
+import cronometro from '../../dist/index.js'
 
-const pattern = /[123]/g
+const pattern = /[1-3]/g
 const replacements: { [key: string]: string } = { 1: 'a', 2: 'b', 3: 'c' }
 
 const subject =
@@ -13,7 +13,7 @@ cronometro(
       subject.replace(pattern, m => replacements[m])
     },
     multiple() {
-      subject.replace(/1/g, 'a').replace(/2/g, 'b').replace(/3/g, 'c')
+      subject.replaceAll('1', 'a').replaceAll('2', 'b').replaceAll('3', 'c')
     }
   },
   { iterations: 5, errorThreshold: 0, print: { compare: true }, warmup: true },

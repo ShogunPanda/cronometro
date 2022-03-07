@@ -2,13 +2,13 @@
 
 import sinon from 'sinon'
 import t from 'tap'
-import { isMainThread } from 'worker_threads'
-import { cronometro, defaultOptions, percentiles } from '../src'
-import { setLogger } from '../src/print'
+import { isMainThread } from 'node:worker_threads'
+import { cronometro, defaultOptions, percentiles } from '../src/index.js'
+import { setLogger } from '../src/print.js'
 
 function removeStyle(source: string): string {
   // eslint-disable-next-line no-control-regex
-  return source.replace(/\x1b\[\d+m/g, '')
+  return source.replace(/\u001B\[\d+m/g, '')
 }
 
 const loggerSpy = sinon.spy()
@@ -107,7 +107,7 @@ if (!isMainThread) {
         const output = loggerSpy.getCall(0).args[0]
 
         // eslint-disable-next-line no-control-regex
-        t.notMatch(output, /\x1b/)
+        t.notMatch(output, /\u001B/)
 
         t.end()
       }

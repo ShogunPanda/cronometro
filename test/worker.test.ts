@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import sinon from 'sinon'
 import t from 'tap'
-import { percentiles, Test } from '../src'
-import { runWorker } from '../src/worker'
+import { percentiles, Test } from '../src/index.js'
+import { runWorker } from '../src/worker.js'
 
 const { spy, stub } = sinon
 
@@ -15,7 +15,7 @@ t.test('Worker execution - Handle sync functions that succeed', t => {
       path: 'fs',
       tests: [['main', main]],
       index: 0,
-      iterations: 10000,
+      iterations: 10_000,
       warmup: false,
       errorThreshold: 100
     },
@@ -81,6 +81,7 @@ t.test('Worker execution - Handle sync functions that throw errors', t => {
 })
 
 t.test('Worker execution - Handle callback functions that succeed', t => {
+  // eslint-disable-next-line unicorn/consistent-function-scoping
   function main(cb: (err?: Error) => void): void {
     cb()
   }
@@ -94,7 +95,7 @@ t.test('Worker execution - Handle callback functions that succeed', t => {
       tests: [['main', mainSpy as Test]],
 
       index: 0,
-      iterations: 10000,
+      iterations: 10_000,
       warmup: false,
       errorThreshold: 1e-9
     },
@@ -107,7 +108,7 @@ t.test('Worker execution - Handle callback functions that succeed', t => {
 
       t.ok(result.success)
       t.type(result.error, 'undefined')
-      t.equal(result.size, 10000)
+      t.equal(result.size, 10_000)
       t.type(result.min, 'number')
       t.type(result.max, 'number')
       t.type(result.mean, 'number')
@@ -124,6 +125,7 @@ t.test('Worker execution - Handle callback functions that succeed', t => {
 })
 
 t.test('Worker execution - Handle callback functions that throw errors', t => {
+  // eslint-disable-next-line unicorn/consistent-function-scoping
   function main(cb: (err?: Error) => void): void {
     cb(new Error('FAILED'))
   }
@@ -341,7 +343,7 @@ t.test('Worker setup - Handle callback before functions', t => {
         ]
       ],
       index: 0,
-      iterations: 10000,
+      iterations: 10_000,
       warmup: false,
       errorThreshold: 100
     },
@@ -391,7 +393,7 @@ t.test('Worker setup - Handle callback before functions that throw errors', t =>
         ]
       ],
       index: 0,
-      iterations: 10000,
+      iterations: 10_000,
       warmup: false,
       errorThreshold: 100
     },
@@ -439,7 +441,7 @@ t.test('Worker setup - Handle promise before functions that resolve', t => {
         ]
       ],
       index: 0,
-      iterations: 10000,
+      iterations: 10_000,
       warmup: false,
       errorThreshold: 100
     },
@@ -489,7 +491,7 @@ t.test('Worker setup - Handle promise before functions that reject', t => {
         ]
       ],
       index: 0,
-      iterations: 10000,
+      iterations: 10_000,
       warmup: false,
       errorThreshold: 100
     },
@@ -537,7 +539,7 @@ t.test('Worker setup - Handle callback after functions', t => {
         ]
       ],
       index: 0,
-      iterations: 10000,
+      iterations: 10_000,
       warmup: false,
       errorThreshold: 100
     },
@@ -587,7 +589,7 @@ t.test('Worker setup - Handle callback after functions that throw errors', t => 
         ]
       ],
       index: 0,
-      iterations: 10000,
+      iterations: 10_000,
       warmup: false,
       errorThreshold: 100
     },
@@ -635,7 +637,7 @@ t.test('Worker setup - Handle promise after functions that resolve', t => {
         ]
       ],
       index: 0,
-      iterations: 10000,
+      iterations: 10_000,
       warmup: false,
       errorThreshold: 100
     },
@@ -685,7 +687,7 @@ t.test('Worker setup - Handle promise after functions that reject', t => {
         ]
       ],
       index: 0,
-      iterations: 10000,
+      iterations: 10_000,
       warmup: false,
       errorThreshold: 100
     },
@@ -720,7 +722,7 @@ t.test('Worker execution - Handle empty tests', t => {
       path: 'fs',
       tests: [['main', {}]],
       index: 0,
-      iterations: 10000,
+      iterations: 10_000,
       warmup: false,
       errorThreshold: 100
     },

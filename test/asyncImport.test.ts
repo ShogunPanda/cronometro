@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 
 import t from 'tap'
-import { isMainThread } from 'worker_threads'
-import { cronometro, percentiles } from '../src'
+import { isMainThread } from 'node:worker_threads'
+import { cronometro, percentiles } from '../src/index.js'
 
 async function main(): Promise<void> {
   await new Promise(resolve => setTimeout(resolve, 100))

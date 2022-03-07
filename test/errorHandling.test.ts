@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 
+import { isMainThread } from 'node:worker_threads'
 import t from 'tap'
-import { isMainThread } from 'worker_threads'
-import { cronometro, percentiles } from '../src'
+import { cronometro, percentiles } from '../src/index.js'
 
 if (!isMainThread) {
   cronometro(
@@ -58,7 +58,7 @@ if (!isMainThread) {
   })
 
   t.test('Runner cannot be run in main thread', async t => {
-    await t.rejects(import('../src/runner'), { message: 'Do not run this file as main script.' })
+    await t.rejects(import('../src/runner.js'), { message: 'Do not run this file as main script.' })
   })
 
   t.only('Runner reports setup errors', async t => {

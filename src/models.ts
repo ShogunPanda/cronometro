@@ -1,5 +1,5 @@
 import { Histogram } from 'hdr-histogram-js'
-import { resolve } from 'path'
+import { resolve } from 'node:path'
 
 export interface PrintOptions {
   colors?: boolean

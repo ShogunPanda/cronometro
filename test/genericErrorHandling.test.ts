@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 
 import t from 'tap'
-import { isMainThread } from 'worker_threads'
-import { cronometro } from '../src'
+import { isMainThread } from 'node:worker_threads'
+import { cronometro } from '../src/index.js'
 
 if (!isMainThread) {
   cronometro(undefined as any, () => false)

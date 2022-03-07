@@ -1,13 +1,11 @@
-'use strict'
-
-import { isMainThread, Worker, workerData } from 'worker_threads'
-import { Callback, Context, defaultOptions, Options, PrintOptions, Results, runnerPath, Tests } from './models'
-import { printResults } from './print'
+import { isMainThread, Worker, workerData } from 'node:worker_threads'
+import { Callback, Context, defaultOptions, Options, PrintOptions, Results, runnerPath, Tests } from './models.js'
+import { printResults } from './print.js'
 
 type PromiseResolver<T> = (value: T) => void
 type PromiseRejecter = (err: Error) => void
 
-export * from './models'
+export * from './models.js'
 
 function scheduleNextTest(context: Context): void {
   // We still have work to do

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 
 import t from 'tap'
-import { cronometro } from '../src'
+import { cronometro } from '../src/index.js'
 
 t.test('Options validation', async t => {
   await t.rejects(

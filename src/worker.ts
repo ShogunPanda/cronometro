@@ -1,5 +1,5 @@
 import { build as buildHistogram } from 'hdr-histogram-js'
-import { Percentiles, percentiles, Result, SetupFunction, TestContext, TestFunction, WorkerContext } from './models'
+import { percentiles, Result, SetupFunction, TestContext, TestFunction, WorkerContext } from './models.js'
 
 function noOp(): void {
   // No-op
@@ -40,7 +40,7 @@ function handleTestIteration(context: TestContext, error?: Error | null): void {
   let stop = false
 
   if (errorThreshold > 0) {
-    const completedPercentage = Math.floor((executed / total) * 10000)
+    const completedPercentage = Math.floor((executed / total) * 10_000)
 
     // Check if abort the test earlier. It is checked every 5% after 10% of the iterations
     if (completedPercentage >= 1000 && completedPercentage % 500 === 0) {
@@ -63,10 +63,9 @@ function handleTestIteration(context: TestContext, error?: Error | null): void {
       max: histogram.maxValue,
       mean: histogram.mean,
       stddev: stdDev,
-      percentiles: percentiles.reduce((accu: Percentiles, percentile) => {
-        accu[percentile] = histogram.getValueAtPercentile(percentile)
-        return accu
-      }, {}),
+      percentiles: Object.fromEntries(
+        percentiles.map(percentile => [percentile, histogram.getValueAtPercentile(percentile)])
+      ),
       standardError: stdDev / Math.sqrt(executed)
     })
   }
@@ -88,13 +87,13 @@ function runTestIteration(context: TestContext): void {
       // The function is not a promise and has no arguments, so it's sync
       context.handler(null)
     }
-  } catch (e) {
+  } catch (error) {
     // If a error was thrown, only handle if the original function length is 0, which means it's a sync error, otherwise propagate
     if (context.test.length === 0) {
-      return context.handler(e)
+      return context.handler(error)
     }
 
-    throw e
+    throw error
   }
 }
 

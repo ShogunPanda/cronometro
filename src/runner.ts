@@ -1,5 +1,5 @@
-import { isMainThread, parentPort, workerData } from 'worker_threads'
-import { runWorker } from './worker'
+import { isMainThread, parentPort, workerData } from 'node:worker_threads'
+import { runWorker } from './worker.js'
 
 if (isMainThread) {
   throw new Error('Do not run this file as main script.')
@@ -35,9 +35,9 @@ chain
     // Run the worker
     runWorker(workerData, value => parentPort!.postMessage(value), process.exit)
   })
-  .catch(e => {
+  .catch(error => {
     process.nextTick(() => {
-      throw e
+      throw error
     })
   })
 /* c8 ignore stop */

@@ -1,6 +1,6 @@
 import { clean, colorize } from 'acquerello'
 import { table } from 'table'
-import { Results } from './models'
+import { Results } from './models.js'
 
 const styles = ['red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white', 'gray']
 
@@ -99,7 +99,7 @@ export function printResults(results: Results, colors: boolean, compare: boolean
     ]
 
     if (compare) {
-      if (relative.match(/^[0.\s]+$/)) {
+      if (/^[\s.0]+$/.test(relative)) {
         row.push('')
       } else {
         row.push(styler(`{{${color}}}+ ${relative} %{{-}}`))
@@ -118,7 +118,7 @@ export function printResults(results: Results, colors: boolean, compare: boolean
     styler('{{bold white}}Tolerance{{-}}')
   ])
 
-  rows.splice(rows.length - 1, 0, [
+  rows.splice(-1, 0, [
     styler('{{bold white}}Fastest test{{-}}'),
     styler('{{bold white}}Samples{{-}}'),
     styler('{{bold white}}Result{{-}}'),
@@ -127,7 +127,7 @@ export function printResults(results: Results, colors: boolean, compare: boolean
 
   if (compare) {
     rows[0].push(styler(`{{bold white}}${compareHeader}{{-}}`))
-    rows[rows.length - 2].push(styler(`{{bold white}}${compareHeader}{{-}}`))
+    rows.at(-2)!.push(styler(`{{bold white}}${compareHeader}{{-}}`))
   }
 
   currentLogger(

@@ -1,3 +1,7 @@
+### 2022-03-07 / 1.0.4
+
+- chore: Updated build system.
+
 ### 2022-01-26 / 1.0.3
 
 - chore: Updated dependencies and linted code.

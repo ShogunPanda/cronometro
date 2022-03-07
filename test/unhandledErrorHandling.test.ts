@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 
-import t from 'tap'
 import { isMainThread } from 'node:worker_threads'
+import t from 'tap'
 import { Callback, cronometro, percentiles } from '../src/index.js'
 
 if (!isMainThread) {

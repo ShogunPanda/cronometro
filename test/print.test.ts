@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 
+import { isMainThread } from 'node:worker_threads'
 import sinon from 'sinon'
 import t from 'tap'
-import { isMainThread } from 'node:worker_threads'
 import { cronometro, defaultOptions, percentiles } from '../src/index.js'
 import { setLogger } from '../src/print.js'
 

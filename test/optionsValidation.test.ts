@@ -37,4 +37,55 @@ t.test('Options validation', async t => {
       t.equal(err!.message, 'The errorThreshold option must be a number between 0 and 100.')
     }
   )
+
+  cronometro(
+    {
+      single() {
+        Buffer.alloc(10)
+      },
+      multiple() {
+        Buffer.alloc(10)
+        Buffer.alloc(20)
+      }
+    },
+    { onTestStart: 1 as any },
+    err => {
+      t.type(err, 'Error')
+      t.equal(err!.message, 'The onTestStart option must be a function.')
+    }
+  )
+
+  cronometro(
+    {
+      single() {
+        Buffer.alloc(10)
+      },
+      multiple() {
+        Buffer.alloc(10)
+        Buffer.alloc(20)
+      }
+    },
+    { onTestEnd: 1 as any },
+    err => {
+      t.type(err, 'Error')
+      t.equal(err!.message, 'The onTestEnd option must be a function.')
+    }
+  )
+
+  cronometro(
+    {
+      single() {
+        Buffer.alloc(10)
+      },
+      multiple() {
+        Buffer.alloc(10)
+        Buffer.alloc(20)
+      }
+    },
+    { onTestError: 1 as any },
+    err => {
+      t.type(err, 'Error')
+      t.equal(err!.message, 'The onTestError option must be a function.')
+    }
+  )
 })

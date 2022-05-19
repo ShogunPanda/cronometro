@@ -1,5 +1,6 @@
 import { Histogram } from 'hdr-histogram-js'
 import { resolve } from 'node:path'
+import { Worker } from 'node:worker_threads'
 
 export interface PrintOptions {
   colors?: boolean
@@ -16,6 +17,9 @@ export interface Options {
   errorThreshold: number
   print: boolean | PrintOptions
   warmup: boolean
+  onTestStart?: (name: string, data: object, worker: Worker) => void
+  onTestEnd?: (name: string, result: Result, worker: Worker) => void
+  onTestError?: (name: string, error: Error, worker: Worker) => void
 }
 
 export type StaticTest = () => any
@@ -64,6 +68,9 @@ export interface Context {
   results: Results
   current: number
   callback: Callback
+  onTestStart?: (name: string, data: object, worker: Worker) => void
+  onTestEnd?: (name: string, result: Result, worker: Worker) => void
+  onTestError?: (name: string, error: Error, worker: Worker) => void
 }
 
 export interface WorkerContext {

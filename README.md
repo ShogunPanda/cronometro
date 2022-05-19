@@ -76,6 +76,9 @@ The supported options are the following:
   - `colors`: If use colors. Default is `true`.
   - `compare`: If compare tests in the output. Default is `false`.
   - `compareMode`: When comparing is enabled, this can be set to `base` in order to always compare a test to the slowest one. The default is to compare a test to the immediate slower one.
+- `onTestStart`: Callback invoked every time a test is started.
+- `onTestEnd`: Callback invoked every time a test has finished.
+- `onTestError`: Callback invoked every time a test could not be loaded. If the test function throws an error or rejects, `onTestEnd` will be invoked instead.
 
 ## Results structure
 

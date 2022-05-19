@@ -61,7 +61,7 @@ if (!isMainThread) {
     await t.rejects(import('../src/runner.js'), { message: 'Do not run this file as main script.' })
   })
 
-  t.only('Runner reports setup errors', async t => {
+  t.test('Runner reports setup errors', async t => {
     const results = await cronometro(
       {
         notDefined() {

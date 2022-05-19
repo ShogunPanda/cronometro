@@ -29,16 +29,19 @@ function scheduleNextTest(context: Context): void {
 
 function run(context: Context): void {
   const name = context.tests[context.current][0]
+  const workerData = {
+    path: process.argv[1],
+    index: context.current,
+    iterations: context.iterations,
+    warmup: context.warmup,
+    errorThreshold: context.errorThreshold
+  }
 
-  const worker = new Worker(runnerPath, {
-    workerData: {
-      path: process.argv[1],
-      index: context.current,
-      iterations: context.iterations,
-      warmup: context.warmup,
-      errorThreshold: context.errorThreshold
-    }
-  })
+  const worker = new Worker(runnerPath, { workerData })
+
+  if (context.onTestStart) {
+    context.onTestStart(name, workerData, worker)
+  }
 
   worker.on('error', error => {
     context.results[name] = {
@@ -55,12 +58,20 @@ function run(context: Context): void {
 
     context.current++
 
+    if (context.onTestError) {
+      context.onTestError(name, error, worker)
+    }
+
     scheduleNextTest(context)
   })
 
   worker.on('message', result => {
     context.results[name] = result
     context.current++
+
+    if (context.onTestEnd) {
+      context.onTestEnd(name, result, worker)
+    }
 
     scheduleNextTest(context)
   })
@@ -109,7 +120,10 @@ export function cronometro(
   }
 
   // Parse and validate options
-  const { iterations, errorThreshold, print, warmup } = { ...defaultOptions, ...options }
+  const { iterations, errorThreshold, print, warmup, onTestStart, onTestEnd, onTestError } = {
+    ...defaultOptions,
+    ...options
+  }
 
   if (typeof iterations !== 'number' || iterations < 1) {
     callback(new Error('The iterations option must be a positive number.'))
@@ -118,6 +132,21 @@ export function cronometro(
 
   if (typeof errorThreshold !== 'number' || errorThreshold < 0 || errorThreshold > 100) {
     callback(new Error('The errorThreshold option must be a number between 0 and 100.'))
+    return promise
+  }
+
+  if (onTestStart && typeof onTestStart !== 'function') {
+    callback(new Error('The onTestStart option must be a function.'))
+    return promise
+  }
+
+  if (onTestEnd && typeof onTestEnd !== 'function') {
+    callback(new Error('The onTestEnd option must be a function.'))
+    return promise
+  }
+
+  if (onTestError && typeof onTestError !== 'function') {
+    callback(new Error('The onTestError option must be a function.'))
     return promise
   }
 
@@ -130,7 +159,10 @@ export function cronometro(
     tests: Object.entries(tests), // Convert tests to a easier to process [name, func] list,
     results: {},
     current: 0,
-    callback
+    callback,
+    onTestStart,
+    onTestEnd,
+    onTestError
   }
 
   process.nextTick(() => run(context))

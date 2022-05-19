@@ -18,7 +18,7 @@ if (!isMainThread) {
     () => false
   )
 } else {
-  t.only('Collecting results', async t => {
+  t.test('Collecting results', async t => {
     const results = await cronometro(
       {
         single() {

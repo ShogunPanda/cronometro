@@ -1,3 +1,7 @@
+### 2022-08-29 / 1.1.1
+
+- chore: Updated dependencies.
+
 ### 2022-05-19 / 1.1.0
 
 - chore: Fixed CI.

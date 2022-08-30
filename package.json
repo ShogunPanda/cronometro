@@ -39,15 +39,15 @@
     "postpublish": "git push origin && git push origin -f --tags"
   },
   "dependencies": {
-    "acquerello": "^1.0.8",
+    "acquerello": "^1.0.9",
     "hdr-histogram-js": "^3.0.0",
     "table": "^6.8.0"
   },
   "devDependencies": {
-    "@cowtech/eslint-config": "^8.7.1",
+    "@cowtech/eslint-config": "^8.7.2",
     "@swc/cli": "^0.1.57",
-    "@swc/core": "^1.2.244",
-    "@types/node": "^18.7.13",
+    "@swc/core": "^1.2.245",
+    "@types/node": "^18.7.14",
     "@types/sinon": "^10.0.13",
     "@types/tap": "^15.0.7",
     "c8": "^7.12.0",

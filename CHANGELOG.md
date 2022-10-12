@@ -1,3 +1,9 @@
+### 2022-10-12 / 1.1.3
+
+- fix: Updated types layout.
+- chore: Updated compilation configuration.
+- chore: Remove lint rule.
+
 ### 2022-08-30 / 1.1.2
 
 - chore: Updated dependencies.

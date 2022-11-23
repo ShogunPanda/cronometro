@@ -14,9 +14,9 @@ interface PrintInfo {
   compared: string
 }
 
-let currentLogger: (message: string, ...params: Array<any>) => void = console.log
+let currentLogger: (message: string, ...params: any[]) => void = console.log
 
-export function setLogger(logger: (message: string, ...params: Array<any>) => void): void {
+export function setLogger(logger: (message: string, ...params: any[]) => void): void {
   currentLogger = logger
 }
 
@@ -28,7 +28,7 @@ export function printResults(results: Results, colors: boolean, compare: boolean
   let compared = ''
   let standardErrorPadding = 0
 
-  const entries: Array<PrintInfo> = Object.entries(results)
+  const entries: PrintInfo[] = Object.entries(results)
     .sort((a, b) => (!a[1].success ? -1 : b[1].mean - a[1].mean))
     .map(([name, result]) => {
       if (!result.success) {
@@ -72,7 +72,7 @@ export function printResults(results: Results, colors: boolean, compare: boolean
 
   let currentColor = 0
 
-  const rows: Array<Array<string>> = entries.map(entry => {
+  const rows: string[][] = entries.map(entry => {
     if (entry.error) {
       const row = [
         styler(`{{gray}}${entry.name}{{-}}`),

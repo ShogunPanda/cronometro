@@ -8,7 +8,7 @@ import { setLogger } from '../src/print.js'
 
 function removeStyle(source: string): string {
   // eslint-disable-next-line no-control-regex
-  return source.replace(/\u001B\[\d+m/g, '')
+  return source.replaceAll(/\u001B\[\d+m/g, '')
 }
 
 const loggerSpy = sinon.spy()

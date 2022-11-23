@@ -64,7 +64,7 @@ export interface Context {
   iterations: number
   errorThreshold: number
   print: boolean | PrintOptions
-  tests: Array<[string, TestFunction | Test]>
+  tests: [string, TestFunction | Test][]
   results: Results
   current: number
   callback: Callback
@@ -75,7 +75,7 @@ export interface Context {
 
 export interface WorkerContext {
   path: string
-  tests: Array<[string, TestFunction | Test]>
+  tests: [string, TestFunction | Test][]
   index: number
   iterations: number
   warmup: boolean

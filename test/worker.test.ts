@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
-import sinon from 'sinon'
 import t from 'tap'
-import { percentiles, Test } from '../src/index.js'
+import { AsyncTest, Result, percentiles } from '../src/index.js'
 import { runWorker } from '../src/worker.js'
 
-const { spy, stub } = sinon
-
 t.test('Worker execution - Handle sync functions that succeed', t => {
-  const main = stub()
-  const notifier = spy()
+  let mainCalls = 0
+  const notifier = t.captureFn(() => {})
+
+  function main() {
+    mainCalls++
+  }
 
   runWorker(
     {
@@ -22,9 +23,9 @@ t.test('Worker execution - Handle sync functions that succeed', t => {
     notifier,
     code => {
       t.equal(code, 0)
-      t.ok(main.called)
+      t.ok(mainCalls > 0)
 
-      const result = notifier.getCall(0).args[0]
+      const result = notifier.calls[0].args[0 as number]! as Result
 
       t.ok(result.success)
       t.type(result.error, 'undefined')
@@ -45,8 +46,13 @@ t.test('Worker execution - Handle sync functions that succeed', t => {
 })
 
 t.test('Worker execution - Handle sync functions that throw errors', t => {
-  const main = stub().throws(new Error('FAILED'))
-  const notifier = spy()
+  let mainCalls = 0
+  const notifier = t.captureFn(() => {})
+
+  async function main() {
+    mainCalls++
+    throw new Error('FAILED')
+  }
 
   runWorker(
     {
@@ -60,9 +66,9 @@ t.test('Worker execution - Handle sync functions that throw errors', t => {
     notifier,
     code => {
       t.equal(code, 1)
-      t.ok(main.called)
+      t.ok(mainCalls > 0)
 
-      const result = notifier.getCall(0).args[0]
+      const result = notifier.calls[0].args[0 as number]! as Result
 
       t.notOk(result.success)
       t.type(result.error, Error)
@@ -81,18 +87,18 @@ t.test('Worker execution - Handle sync functions that throw errors', t => {
 })
 
 t.test('Worker execution - Handle callback functions that succeed', t => {
-  // eslint-disable-next-line unicorn/consistent-function-scoping
+  let mainCalls = 0
+  const notifier = t.captureFn(() => {})
+
   function main(cb: (err?: Error) => void): void {
+    mainCalls++
     cb()
   }
-
-  const mainSpy = spy(main)
-  const notifier = spy()
 
   runWorker(
     {
       path: 'fs',
-      tests: [['main', mainSpy as Test]],
+      tests: [['main', main as AsyncTest]],
 
       index: 0,
       iterations: 10_000,
@@ -102,9 +108,9 @@ t.test('Worker execution - Handle callback functions that succeed', t => {
     notifier,
     code => {
       t.equal(code, 0)
-      t.ok(mainSpy.called)
+      t.ok(mainCalls > 0)
 
-      const result = notifier.getCall(0).args[0]
+      const result = notifier.calls[0].args[0 as number]! as Result
 
       t.ok(result.success)
       t.type(result.error, 'undefined')
@@ -125,18 +131,18 @@ t.test('Worker execution - Handle callback functions that succeed', t => {
 })
 
 t.test('Worker execution - Handle callback functions that throw errors', t => {
-  // eslint-disable-next-line unicorn/consistent-function-scoping
+  let mainCalls = 0
+  const notifier = t.captureFn(() => {})
+
   function main(cb: (err?: Error) => void): void {
+    mainCalls++
     cb(new Error('FAILED'))
   }
-
-  const mainSpy = spy(main)
-  const notifier = spy()
 
   runWorker(
     {
       path: 'fs',
-      tests: [['main', mainSpy as Test]],
+      tests: [['main', main as AsyncTest]],
 
       index: 0,
       iterations: 5,
@@ -146,9 +152,9 @@ t.test('Worker execution - Handle callback functions that throw errors', t => {
     notifier,
     code => {
       t.equal(code, 1)
-      t.ok(mainSpy.called)
+      t.ok(mainCalls > 0)
 
-      const result = notifier.getCall(0).args[0]
+      const result = notifier.calls[0].args[0 as number]! as Result
 
       t.notOk(result.success)
       t.type(result.error, Error)
@@ -167,8 +173,12 @@ t.test('Worker execution - Handle callback functions that throw errors', t => {
 })
 
 t.test('Worker execution - Handle promise functions that resolve', t => {
-  const main = stub().resolves()
-  const notifier = spy()
+  let mainCalls = 0
+  const notifier = t.captureFn(() => {})
+
+  async function main() {
+    mainCalls++
+  }
 
   runWorker(
     {
@@ -183,9 +193,9 @@ t.test('Worker execution - Handle promise functions that resolve', t => {
     notifier,
     code => {
       t.equal(code, 0)
-      t.ok(main.called)
+      t.ok(mainCalls > 0)
 
-      const result = notifier.getCall(0).args[0]
+      const result = notifier.calls[0].args[0 as number]! as Result
 
       t.ok(result.success)
       t.type(result.error, 'undefined')
@@ -206,8 +216,13 @@ t.test('Worker execution - Handle promise functions that resolve', t => {
 })
 
 t.test('Worker execution - Handle promise functions that reject', t => {
-  const main = stub().rejects(new Error('FAILED'))
-  const notifier = spy()
+  let mainCalls = 0
+  const notifier = t.captureFn(() => {})
+
+  function main() {
+    mainCalls++
+    throw new Error('FAILED')
+  }
 
   runWorker(
     {
@@ -222,9 +237,9 @@ t.test('Worker execution - Handle promise functions that reject', t => {
     notifier,
     code => {
       t.equal(code, 1)
-      t.ok(main.called)
+      t.ok(mainCalls > 0)
 
-      const result = notifier.getCall(0).args[0]
+      const result = notifier.calls[0].args[0 as number]! as Result
 
       t.notOk(result.success)
       t.type(result.error, Error)
@@ -243,8 +258,12 @@ t.test('Worker execution - Handle promise functions that reject', t => {
 })
 
 t.test('Worker execution - Handle warmup mode enabled', t => {
-  const main = stub()
-  const notifier = spy()
+  let mainCalls = 0
+  const notifier = t.captureFn(() => {})
+
+  function main() {
+    mainCalls++
+  }
 
   runWorker(
     {
@@ -259,10 +278,10 @@ t.test('Worker execution - Handle warmup mode enabled', t => {
     notifier,
     code => {
       t.equal(code, 0)
-      t.equal(main.callCount, 10)
-      t.equal(notifier.callCount, 1)
+      t.equal(mainCalls, 10)
+      t.equal(notifier.calls.length, 1)
 
-      const result = notifier.getCall(0).args[0]
+      const result = notifier.calls[0].args[0 as number]! as Result
 
       t.ok(result.success)
       t.type(result.error, 'undefined')
@@ -283,8 +302,12 @@ t.test('Worker execution - Handle warmup mode enabled', t => {
 })
 
 t.test('Worker execution - Handle warmup mode disabled', t => {
-  const main = stub()
-  const notifier = spy()
+  let mainCalls = 0
+  const notifier = t.captureFn(() => {})
+
+  function main() {
+    mainCalls++
+  }
 
   runWorker(
     {
@@ -299,10 +322,10 @@ t.test('Worker execution - Handle warmup mode disabled', t => {
     notifier,
     code => {
       t.equal(code, 0)
-      t.equal(main.callCount, 5)
-      t.equal(notifier.callCount, 1)
+      t.equal(mainCalls, 5)
+      t.equal(notifier.calls.length, 1)
 
-      const result = notifier.getCall(0).args[0]
+      const result = notifier.calls[0].args[0 as number]! as Result
 
       t.ok(result.success)
       t.type(result.error, 'undefined')
@@ -323,9 +346,13 @@ t.test('Worker execution - Handle warmup mode disabled', t => {
 })
 
 t.test('Worker setup - Handle callback before functions', t => {
-  const main = stub()
-  const setup = spy()
-  const notifier = spy()
+  let mainCalls = 0
+  let setupCalls = 0
+  const notifier = t.captureFn(() => {})
+
+  function main() {
+    mainCalls++
+  }
 
   runWorker(
     {
@@ -336,7 +363,7 @@ t.test('Worker setup - Handle callback before functions', t => {
           {
             test: main,
             before(cb: (err?: Error | null) => void): void {
-              setup()
+              setupCalls++
               cb()
             }
           }
@@ -350,11 +377,11 @@ t.test('Worker setup - Handle callback before functions', t => {
     notifier,
     code => {
       t.equal(code, 0)
-      t.equal(setup.callCount, 1)
-      t.ok(main.called)
-      t.equal(notifier.callCount, 1)
+      t.equal(setupCalls, 1)
+      t.ok(mainCalls > 0)
+      t.equal(notifier.calls.length, 1)
 
-      const result = notifier.getCall(0).args[0]
+      const result = notifier.calls[0].args[0 as number]! as Result
 
       t.ok(result.success)
       t.type(result.error, 'undefined')
@@ -375,8 +402,12 @@ t.test('Worker setup - Handle callback before functions', t => {
 })
 
 t.test('Worker setup - Handle callback before functions that throw errors', t => {
-  const main = stub()
-  const notifier = spy()
+  let mainCalls = 0
+  const notifier = t.captureFn(() => {})
+
+  function main() {
+    mainCalls++
+  }
 
   runWorker(
     {
@@ -400,9 +431,9 @@ t.test('Worker setup - Handle callback before functions that throw errors', t =>
     notifier,
     code => {
       t.equal(code, 1)
-      t.notOk(main.called)
+      t.notOk(mainCalls)
 
-      const result = notifier.getCall(0).args[0]
+      const result = notifier.calls[0].args[0 as number]! as Result
 
       t.notOk(result.success)
       t.type(result.error, Error)
@@ -421,9 +452,13 @@ t.test('Worker setup - Handle callback before functions that throw errors', t =>
 })
 
 t.test('Worker setup - Handle promise before functions that resolve', t => {
-  const main = stub()
-  const setup = spy()
-  const notifier = spy()
+  let mainCalls = 0
+  let setupCalls = 0
+  const notifier = t.captureFn(() => {})
+
+  function main() {
+    mainCalls++
+  }
 
   runWorker(
     {
@@ -434,7 +469,7 @@ t.test('Worker setup - Handle promise before functions that resolve', t => {
           {
             test: main,
             before() {
-              setup()
+              setupCalls++
               return Promise.resolve()
             }
           }
@@ -448,11 +483,11 @@ t.test('Worker setup - Handle promise before functions that resolve', t => {
     notifier,
     code => {
       t.equal(code, 0)
-      t.equal(setup.callCount, 1)
-      t.ok(main.called)
-      t.equal(notifier.callCount, 1)
+      t.equal(setupCalls, 1)
+      t.ok(mainCalls > 0)
+      t.equal(notifier.calls.length, 1)
 
-      const result = notifier.getCall(0).args[0]
+      const result = notifier.calls[0].args[0 as number]! as Result
 
       t.ok(result.success)
       t.type(result.error, 'undefined')
@@ -473,8 +508,12 @@ t.test('Worker setup - Handle promise before functions that resolve', t => {
 })
 
 t.test('Worker setup - Handle promise before functions that reject', t => {
-  const main = stub()
-  const notifier = spy()
+  let mainCalls = 0
+  const notifier = t.captureFn(() => {})
+
+  function main() {
+    mainCalls++
+  }
 
   runWorker(
     {
@@ -498,9 +537,9 @@ t.test('Worker setup - Handle promise before functions that reject', t => {
     notifier,
     code => {
       t.equal(code, 1)
-      t.notOk(main.called)
+      t.notOk(mainCalls)
 
-      const result = notifier.getCall(0).args[0]
+      const result = notifier.calls[0].args[0 as number]! as Result
 
       t.notOk(result.success)
       t.type(result.error, Error)
@@ -519,9 +558,13 @@ t.test('Worker setup - Handle promise before functions that reject', t => {
 })
 
 t.test('Worker setup - Handle callback after functions', t => {
-  const main = stub()
-  const setup = spy()
-  const notifier = spy()
+  let mainCalls = 0
+  let setupCalls = 0
+  const notifier = t.captureFn(() => {})
+
+  function main() {
+    mainCalls++
+  }
 
   runWorker(
     {
@@ -532,7 +575,7 @@ t.test('Worker setup - Handle callback after functions', t => {
           {
             test: main,
             after(cb: (err?: Error | null) => void): void {
-              setup()
+              setupCalls++
               cb()
             }
           }
@@ -546,11 +589,11 @@ t.test('Worker setup - Handle callback after functions', t => {
     notifier,
     code => {
       t.equal(code, 0)
-      t.equal(setup.callCount, 1)
-      t.ok(main.called)
-      t.equal(notifier.callCount, 1)
+      t.equal(setupCalls, 1)
+      t.ok(mainCalls > 0)
+      t.equal(notifier.calls.length, 1)
 
-      const result = notifier.getCall(0).args[0]
+      const result = notifier.calls[0].args[0 as number]! as Result
 
       t.ok(result.success)
       t.type(result.error, 'undefined')
@@ -571,8 +614,12 @@ t.test('Worker setup - Handle callback after functions', t => {
 })
 
 t.test('Worker setup - Handle callback after functions that throw errors', t => {
-  const main = stub()
-  const notifier = spy()
+  let mainCalls = 0
+  const notifier = t.captureFn(() => {})
+
+  function main() {
+    mainCalls++
+  }
 
   runWorker(
     {
@@ -596,9 +643,9 @@ t.test('Worker setup - Handle callback after functions that throw errors', t => 
     notifier,
     code => {
       t.equal(code, 1)
-      t.ok(main.called)
+      t.ok(mainCalls > 0)
 
-      const result = notifier.getCall(0).args[0]
+      const result = notifier.calls[0].args[0 as number]! as Result
 
       t.notOk(result.success)
       t.type(result.error, Error)
@@ -617,9 +664,13 @@ t.test('Worker setup - Handle callback after functions that throw errors', t => 
 })
 
 t.test('Worker setup - Handle promise after functions that resolve', t => {
-  const main = stub()
-  const setup = spy()
-  const notifier = spy()
+  let mainCalls = 0
+  let setupCalls = 0
+  const notifier = t.captureFn(() => {})
+
+  function main() {
+    mainCalls++
+  }
 
   runWorker(
     {
@@ -630,7 +681,7 @@ t.test('Worker setup - Handle promise after functions that resolve', t => {
           {
             test: main,
             after() {
-              setup()
+              setupCalls++
               return Promise.resolve()
             }
           }
@@ -644,11 +695,11 @@ t.test('Worker setup - Handle promise after functions that resolve', t => {
     notifier,
     code => {
       t.equal(code, 0)
-      t.equal(setup.callCount, 1)
-      t.ok(main.called)
-      t.equal(notifier.callCount, 1)
+      t.equal(setupCalls, 1)
+      t.ok(mainCalls > 0)
+      t.equal(notifier.calls.length, 1)
 
-      const result = notifier.getCall(0).args[0]
+      const result = notifier.calls[0].args[0 as number]! as Result
 
       t.ok(result.success)
       t.type(result.error, 'undefined')
@@ -669,8 +720,12 @@ t.test('Worker setup - Handle promise after functions that resolve', t => {
 })
 
 t.test('Worker setup - Handle promise after functions that reject', t => {
-  const main = stub()
-  const notifier = spy()
+  let mainCalls = 0
+  const notifier = t.captureFn(() => {})
+
+  function main() {
+    mainCalls++
+  }
 
   runWorker(
     {
@@ -694,9 +749,9 @@ t.test('Worker setup - Handle promise after functions that reject', t => {
     notifier,
     code => {
       t.equal(code, 1)
-      t.ok(main.called)
+      t.ok(mainCalls > 0)
 
-      const result = notifier.getCall(0).args[0]
+      const result = notifier.calls[0].args[0 as number]! as Result
 
       t.notOk(result.success)
       t.type(result.error, Error)
@@ -715,7 +770,7 @@ t.test('Worker setup - Handle promise after functions that reject', t => {
 })
 
 t.test('Worker execution - Handle empty tests', t => {
-  const notifier = spy()
+  const notifier = t.captureFn(() => {})
 
   runWorker(
     {
@@ -730,7 +785,7 @@ t.test('Worker execution - Handle empty tests', t => {
     code => {
       t.equal(code, 0)
 
-      const result = notifier.getCall(0).args[0]
+      const result = notifier.calls[0].args[0 as number]! as Result
 
       t.ok(result.success)
       t.type(result.error, 'undefined')

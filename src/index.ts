@@ -1,5 +1,14 @@
 import { isMainThread, Worker, workerData } from 'node:worker_threads'
-import { Callback, Context, defaultOptions, Options, PrintOptions, Results, runnerPath, Tests } from './models.js'
+import {
+  defaultOptions,
+  runnerPath,
+  type Callback,
+  type Context,
+  type Options,
+  type PrintOptions,
+  type Results,
+  type Tests
+} from './models.js'
 import { printResults } from './print.js'
 
 type PromiseResolver<T> = (value: T) => void
@@ -10,7 +19,10 @@ export * from './models.js'
 function scheduleNextTest(context: Context): void {
   // We still have work to do
   if (context.current < context.tests.length) {
-    return process.nextTick(() => run(context))
+    process.nextTick(() => {
+      run(context)
+    })
+    return
   }
 
   if (context.print) {
@@ -65,7 +77,13 @@ function run(context: Context): void {
     scheduleNextTest(context)
   })
 
-  worker.on('message', result => {
+  worker.on('message', message => {
+    if (message.type !== 'cronometro.result') {
+      return
+    }
+
+    const result = message.payload
+
     context.results[name] = result
     context.current++
 
@@ -112,10 +130,11 @@ export function cronometro(
 
     callback = function (err: Error | null, results?: Results): void {
       if (err) {
-        return promiseReject(err)
+        promiseReject(err)
+        return
       }
 
-      return promiseResolve(results!)
+      promiseResolve(results!)
     }
   }
 
@@ -165,7 +184,9 @@ export function cronometro(
     onTestError
   }
 
-  process.nextTick(() => run(context))
+  process.nextTick(() => {
+    run(context)
+  })
   return promise
 }
 

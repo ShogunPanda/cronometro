@@ -13,7 +13,6 @@ if (workerData.path.endsWith('.ts')) {
   const instance = Symbol.for('ts-node.register.instance')
 
   if (!(instance in process)) {
-    // eslint-disable-next-line unicorn/prefer-top-level-await
     chain = import('ts-node').then(({ register }) => {
       register({ project: process.env.TS_NODE_PROJECT })
     })
@@ -34,9 +33,14 @@ chain
   })
   .then(() => {
     // Run the worker
-    runWorker(workerData, value => parentPort!.postMessage(value), process.exit)
+    runWorker(
+      workerData,
+      value => {
+        parentPort!.postMessage({ type: 'cronometro.result', payload: value })
+      },
+      process.exit
+    )
   })
-  // eslint-disable-next-line unicorn/prefer-top-level-await
   .catch(error => {
     process.nextTick(() => {
       throw error

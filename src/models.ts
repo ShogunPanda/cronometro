@@ -1,6 +1,6 @@
-import { Histogram } from 'hdr-histogram-js'
+import { type Histogram } from 'hdr-histogram-js'
 import { resolve } from 'node:path'
-import { Worker } from 'node:worker_threads'
+import { type Worker } from 'node:worker_threads'
 
 export interface PrintOptions {
   colors?: boolean
@@ -13,7 +13,7 @@ export type SetupFunction = (cb: (err?: Error | null) => void) => Promise<any> |
 
 export interface Options {
   iterations: number
-  setup: { [key: string]: SetupFunction }
+  setup: Record<string, SetupFunction>
   errorThreshold: number
   print: boolean | PrintOptions
   warmup: boolean
@@ -35,9 +35,7 @@ export interface Test {
 
 export type Callback = (err: Error | null, results: Results) => any
 
-export interface Percentiles {
-  [key: string]: number
-}
+export type Percentiles = Record<string, number>
 
 export interface Result {
   success: boolean
@@ -51,13 +49,9 @@ export interface Result {
   percentiles: Percentiles
 }
 
-export interface Tests {
-  [key: string]: TestFunction | Test
-}
+export type Tests = Record<string, TestFunction | Test>
 
-export interface Results {
-  [key: string]: Result
-}
+export type Results = Record<string, Result>
 
 export interface Context {
   warmup: boolean

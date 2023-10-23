@@ -55,7 +55,6 @@ async function main(): Promise<void> {
   }
 }
 
-// eslint-disable-next-line unicorn/prefer-top-level-await
 main()
 
 export default main

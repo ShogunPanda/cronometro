@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 
 import { isMainThread } from 'node:worker_threads'
-import sinon from 'sinon'
 import t from 'tap'
 import { cronometro, defaultOptions, percentiles } from '../src/index.js'
 import { setLogger } from '../src/print.js'
@@ -11,9 +10,9 @@ function removeStyle(source: string): string {
   return source.replaceAll(/\u001B\[\d+m/g, '')
 }
 
-const loggerSpy = sinon.spy()
+function loggerBase() {}
+
 defaultOptions.iterations = 10
-setLogger(loggerSpy)
 
 if (!isMainThread) {
   cronometro(
@@ -31,9 +30,10 @@ if (!isMainThread) {
     () => false
   )
 } else {
-  t.afterEach(() => loggerSpy.resetHistory())
-
   t.test('Printing - Default options', t => {
+    const logger = t.captureFn(loggerBase)
+    setLogger(logger)
+
     cronometro(
       {
         single() {
@@ -77,7 +77,7 @@ if (!isMainThread) {
           }
         }
 
-        const output = removeStyle(loggerSpy.getCall(0).args[0])
+        const output = removeStyle(logger.calls[0].args[0 as number]!)
         t.match(output, /║\s+Slower tests\s+|\s+Samples\s+|\s+Result\s+|\s+Tolerance\s+║/)
         t.match(output, /║\s+Faster test\s+|\s+Samples\s+|\s+Result\s+|\s+Tolerance\s+║/)
         t.match(output, /║\s+(single|multiple)\s+|\s+10\s+|\s+\d+\.\d{2}\sop\/sec\s+|\s+±\s\d+.\d{2}\s%\s+║/)
@@ -88,6 +88,9 @@ if (!isMainThread) {
   })
 
   t.test('Printing - No colors', t => {
+    const logger = t.captureFn(loggerBase)
+    setLogger(logger)
+
     cronometro(
       {
         single() {
@@ -104,7 +107,7 @@ if (!isMainThread) {
       err => {
         t.equal(err, null)
 
-        const output = loggerSpy.getCall(0).args[0]
+        const output = removeStyle(logger.calls[0].args[0 as number]!)
 
         // eslint-disable-next-line no-control-regex
         t.notMatch(output, /\u001B/)
@@ -115,6 +118,9 @@ if (!isMainThread) {
   })
 
   t.test('Printing - Base compare', t => {
+    const logger = t.captureFn(loggerBase)
+    setLogger(logger)
+
     cronometro(
       {
         single() {
@@ -131,7 +137,7 @@ if (!isMainThread) {
       err => {
         t.equal(err, null)
 
-        const output = removeStyle(loggerSpy.getCall(0).args[0])
+        const output = removeStyle(logger.calls[0].args[0 as number]!)
         t.match(output, /║\s+Slower tests\s+|\s+Samples\s+|\s+Result\s+|\s+Tolerance\s+|\s+Difference with slowest║/)
         t.match(output, /║\s+Fastest test\s+|\s+Samples\s+|\s+Result\s+|\s+Tolerance\s+|\s+Difference with slowest║/)
         t.match(output, /║\s+(single|multiple)\s+|\s+10\s+|\s+\d+\.\d{2}\sop\/sec\s+|\s+±\s\d+.\d{2}\s%\s+|\s+║/)
@@ -146,6 +152,9 @@ if (!isMainThread) {
   })
 
   t.test('Printing - Previous compare', t => {
+    const logger = t.captureFn(loggerBase)
+    setLogger(logger)
+
     cronometro(
       {
         single() {
@@ -162,7 +171,7 @@ if (!isMainThread) {
       err => {
         t.equal(err, null)
 
-        const output = removeStyle(loggerSpy.getCall(0).args[0])
+        const output = removeStyle(logger.calls[0].args[0 as number]!)
         t.match(
           output,
           /║\s+Slower tests\s+|\s+Samples\s+|\s+Result\s+|\s+Tolerance\s+|\s+Difference with previous\s+║/

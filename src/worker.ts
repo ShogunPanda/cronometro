@@ -1,5 +1,12 @@
 import { build as buildHistogram } from 'hdr-histogram-js'
-import { percentiles, Result, SetupFunction, TestContext, TestFunction, WorkerContext } from './models.js'
+import {
+  percentiles,
+  type Result,
+  type SetupFunction,
+  type TestContext,
+  type TestFunction,
+  type WorkerContext
+} from './models.js'
 
 function noOp(): void {
   // No-op
@@ -15,7 +22,7 @@ function handleTestIteration(context: TestContext, error?: Error | null): void {
 
   // Handle error
   if (error) {
-    return context.callback({
+    context.callback({
       success: false,
       error,
       size: 0,
@@ -26,6 +33,7 @@ function handleTestIteration(context: TestContext, error?: Error | null): void {
       percentiles: {},
       standardError: 0
     })
+    return
   }
 
   // Get some parameters
@@ -56,7 +64,7 @@ function handleTestIteration(context: TestContext, error?: Error | null): void {
   if (stop || executed > total) {
     const stdDev = histogram.stdDeviation
 
-    return context.callback({
+    context.callback({
       success: true,
       size: executed,
       min: histogram.minNonZeroValue,
@@ -68,10 +76,13 @@ function handleTestIteration(context: TestContext, error?: Error | null): void {
       ),
       standardError: stdDev / Math.sqrt(executed)
     })
+    return
   }
 
   // Schedule next iteration
-  process.nextTick(() => runTestIteration(context))
+  process.nextTick(() => {
+    runTestIteration(context)
+  })
 }
 
 function runTestIteration(context: TestContext): void {
@@ -82,7 +93,9 @@ function runTestIteration(context: TestContext): void {
 
     // It is a promise, handle it accordingly
     if (callResult && typeof callResult.then === 'function') {
-      callResult.then(() => context.handler(null), context.handler)
+      callResult.then(() => {
+        context.handler(null)
+      }, context.handler)
     } else if (context.test.length === 0) {
       // The function is not a promise and has no arguments, so it's sync
       context.handler(null)
@@ -90,7 +103,8 @@ function runTestIteration(context: TestContext): void {
   } catch (error) {
     // If a error was thrown, only handle if the original function length is 0, which means it's a sync error, otherwise propagate
     if (context.test.length === 0) {
-      return context.handler(error)
+      context.handler(error)
+      return
     }
 
     throw error
@@ -99,7 +113,7 @@ function runTestIteration(context: TestContext): void {
 
 function beforeCallback(testContext: TestContext, err?: Error | null): void {
   if (err) {
-    return testContext.callback({
+    testContext.callback({
       success: false,
       error: err,
       size: 0,
@@ -110,10 +124,13 @@ function beforeCallback(testContext: TestContext, err?: Error | null): void {
       percentiles: {},
       standardError: 0
     })
+    return
   }
 
   // Schedule the first run
-  return process.nextTick(() => runTestIteration(testContext))
+  process.nextTick(() => {
+    runTestIteration(testContext)
+  })
 }
 
 function afterCallback(
@@ -190,7 +207,8 @@ export function runWorker(context: WorkerContext, notifier: (value: any) => void
     callback(result: Result): void {
       if (warmup) {
         context.warmup = false
-        return runWorker(context, notifier, cb)
+        runWorker(context, notifier, cb)
+        return
       }
 
       const callback = afterCallback.bind(null, result, notifier, cb)

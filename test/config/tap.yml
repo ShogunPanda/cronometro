@@ -1,7 +1,7 @@
 ---
 jobs: 5
-timeout: 120
-reporter: spec
-coverage: false
+timeout: 60
+disable-coverage: true
+allow-empty-coverage: true
 node-arg:
   - --loader=ts-node/esm

@@ -2,7 +2,7 @@
 
 import { isMainThread, Worker } from 'node:worker_threads'
 import t from 'tap'
-import { cronometro, Result, TestFunction } from '../src/index.js'
+import { cronometro, type Result, type TestFunction } from '../src/index.js'
 
 if (!isMainThread) {
   cronometro(

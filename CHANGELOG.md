@@ -1,3 +1,10 @@
+### 2023-10-23 / 1.2.0
+
+- chore: Linted code.
+- chore: Updated dependencies and toolchain.
+- chore: Fixed compilation.
+- chore: CI improvement
+
 ### 2022-11-23 / 1.1.5
 
 - chore: Updated dependencies.

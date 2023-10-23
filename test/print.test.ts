@@ -10,7 +10,7 @@ function removeStyle(source: string): string {
   return source.replaceAll(/\u001B\[\d+m/g, '')
 }
 
-function loggerBase() {}
+function loggerBase(): void {}
 
 defaultOptions.iterations = 10
 

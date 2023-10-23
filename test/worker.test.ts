@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import t from 'tap'
-import { AsyncTest, Result, percentiles } from '../src/index.js'
+import { percentiles, type AsyncTest, type Result } from '../src/index.js'
 import { runWorker } from '../src/worker.js'
 
 t.test('Worker execution - Handle sync functions that succeed', t => {
   let mainCalls = 0
   const notifier = t.captureFn(() => {})
 
-  function main() {
+  function main(): void {
     mainCalls++
   }
 
@@ -49,7 +49,8 @@ t.test('Worker execution - Handle sync functions that throw errors', t => {
   let mainCalls = 0
   const notifier = t.captureFn(() => {})
 
-  async function main() {
+  /* eslint-disable-next-line @typescript-eslint/require-await */
+  async function main(): Promise<void> {
     mainCalls++
     throw new Error('FAILED')
   }
@@ -176,7 +177,8 @@ t.test('Worker execution - Handle promise functions that resolve', t => {
   let mainCalls = 0
   const notifier = t.captureFn(() => {})
 
-  async function main() {
+  /* eslint-disable-next-line @typescript-eslint/require-await */
+  async function main(): Promise<void> {
     mainCalls++
   }
 
@@ -219,7 +221,8 @@ t.test('Worker execution - Handle promise functions that reject', t => {
   let mainCalls = 0
   const notifier = t.captureFn(() => {})
 
-  function main() {
+  /* eslint-disable-next-line @typescript-eslint/require-await */
+  async function main(): Promise<void> {
     mainCalls++
     throw new Error('FAILED')
   }
@@ -261,7 +264,7 @@ t.test('Worker execution - Handle warmup mode enabled', t => {
   let mainCalls = 0
   const notifier = t.captureFn(() => {})
 
-  function main() {
+  function main(): void {
     mainCalls++
   }
 
@@ -305,7 +308,7 @@ t.test('Worker execution - Handle warmup mode disabled', t => {
   let mainCalls = 0
   const notifier = t.captureFn(() => {})
 
-  function main() {
+  function main(): void {
     mainCalls++
   }
 
@@ -350,7 +353,7 @@ t.test('Worker setup - Handle callback before functions', t => {
   let setupCalls = 0
   const notifier = t.captureFn(() => {})
 
-  function main() {
+  function main(): void {
     mainCalls++
   }
 
@@ -405,7 +408,7 @@ t.test('Worker setup - Handle callback before functions that throw errors', t =>
   let mainCalls = 0
   const notifier = t.captureFn(() => {})
 
-  function main() {
+  function main(): void {
     mainCalls++
   }
 
@@ -456,7 +459,7 @@ t.test('Worker setup - Handle promise before functions that resolve', t => {
   let setupCalls = 0
   const notifier = t.captureFn(() => {})
 
-  function main() {
+  function main(): void {
     mainCalls++
   }
 
@@ -511,7 +514,7 @@ t.test('Worker setup - Handle promise before functions that reject', t => {
   let mainCalls = 0
   const notifier = t.captureFn(() => {})
 
-  function main() {
+  function main(): void {
     mainCalls++
   }
 
@@ -562,7 +565,7 @@ t.test('Worker setup - Handle callback after functions', t => {
   let setupCalls = 0
   const notifier = t.captureFn(() => {})
 
-  function main() {
+  function main(): void {
     mainCalls++
   }
 
@@ -617,7 +620,7 @@ t.test('Worker setup - Handle callback after functions that throw errors', t => 
   let mainCalls = 0
   const notifier = t.captureFn(() => {})
 
-  function main() {
+  function main(): void {
     mainCalls++
   }
 
@@ -668,7 +671,7 @@ t.test('Worker setup - Handle promise after functions that resolve', t => {
   let setupCalls = 0
   const notifier = t.captureFn(() => {})
 
-  function main() {
+  function main(): void {
     mainCalls++
   }
 
@@ -723,7 +726,7 @@ t.test('Worker setup - Handle promise after functions that reject', t => {
   let mainCalls = 0
   const notifier = t.captureFn(() => {})
 
-  function main() {
+  function main(): void {
     mainCalls++
   }
 

@@ -1,3 +1,7 @@
+### 2023-12-20 / 2.0.0
+
+- chore: Updated dependencies.
+
 ### 2023-10-23 / 1.2.0
 
 - chore: Linted code.

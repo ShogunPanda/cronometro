@@ -103,7 +103,7 @@ function runTestIteration(context: TestContext): void {
   } catch (error) {
     // If a error was thrown, only handle if the original function length is 0, which means it's a sync error, otherwise propagate
     if (context.test.length === 0) {
-      context.handler(error)
+      context.handler(error as Error)
       return
     }
 

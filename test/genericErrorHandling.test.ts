@@ -2,10 +2,10 @@
 
 import { isMainThread } from 'node:worker_threads'
 import t from 'tap'
-import { cronometro } from '../src/index.js'
+import { cronometro, type Tests } from '../src/index.js'
 
 if (!isMainThread) {
-  cronometro(undefined as any, () => false)
+  cronometro(undefined as unknown as Tests, () => false)
 } else {
   t.test('Generic error handling', async t => {
     const results = await cronometro(

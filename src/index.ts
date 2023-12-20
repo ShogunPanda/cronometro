@@ -1,6 +1,7 @@
 import { isMainThread, Worker, workerData } from 'node:worker_threads'
 import {
   defaultOptions,
+  type Result,
   runnerPath,
   type Callback,
   type Context,
@@ -88,7 +89,7 @@ function run(context: Context): void {
     context.current++
 
     if (context.onTestEnd) {
-      context.onTestEnd(name, result, worker)
+      context.onTestEnd(name, result as Result, worker)
     }
 
     scheduleNextTest(context)

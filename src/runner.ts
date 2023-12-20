@@ -1,4 +1,5 @@
 import { isMainThread, parentPort, workerData } from 'node:worker_threads'
+import { type WorkerContext } from './models.js'
 import { runWorker } from './worker.js'
 
 if (isMainThread) {
@@ -34,11 +35,11 @@ chain
   .then(() => {
     // Run the worker
     runWorker(
-      workerData,
+      workerData as WorkerContext,
       value => {
         parentPort!.postMessage({ type: 'cronometro.result', payload: value })
       },
-      process.exit
+      (code: number) => process.exit(code)
     )
   })
   .catch(error => {

@@ -1,6 +1,6 @@
 {
   "name": "cronometro",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Simple benchmarking suite powered by HDR histograms.",
   "homepage": "https://sw.cowtech.it/cronometro",
   "repository": {

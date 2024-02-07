@@ -1,3 +1,7 @@
+### 2024-02-07 / 3.0.0
+
+- feat!: Replaced ts-node with @swc-node/register.
+
 ### 2024-01-27 / 2.0.2
 
 - chore: Updated dependencies.

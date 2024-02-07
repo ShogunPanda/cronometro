@@ -1,3 +1,4 @@
 {
+  "exclude": ["dist", "test"],
   "reporter": ["text", "html"]
 }

@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 
+import { deepStrictEqual, ifError, match, ok } from 'node:assert'
+import { test } from 'node:test'
 import { isMainThread } from 'node:worker_threads'
-import t from 'tap'
 import { cronometro, defaultOptions, percentiles } from '../src/index.js'
 import { setLogger } from '../src/print.js'
 
@@ -9,8 +10,6 @@ function removeStyle(source: string): string {
   // eslint-disable-next-line no-control-regex
   return source.replaceAll(/\u001B\[\d+m/g, '')
 }
-
-function loggerBase(): void {}
 
 defaultOptions.iterations = 10
 
@@ -30,8 +29,8 @@ if (!isMainThread) {
     () => false
   )
 } else {
-  t.test('Printing - Default options', t => {
-    const logger = t.captureFn(loggerBase)
+  test('Printing - Default options', (t, done) => {
+    const logger = t.mock.fn()
     setLogger(logger)
 
     cronometro(
@@ -47,48 +46,48 @@ if (!isMainThread) {
         }
       },
       (err, results) => {
-        t.equal(err, null)
-        t.strictSame(Object.keys(results), ['single', 'multiple', 'error'])
+        ifError(err)
+        deepStrictEqual(Object.keys(results), ['single', 'multiple', 'error'])
 
-        t.notOk(results.error.success)
-        t.type(results.error.error, Error)
-        t.equal(results.error.error!.message, 'FAILED')
-        t.equal(results.error.size, 0)
-        t.equal(results.error.min, 0)
-        t.equal(results.error.max, 0)
-        t.equal(results.error.mean, 0)
-        t.equal(results.error.stddev, 0)
-        t.equal(results.error.standardError, 0)
-        t.strictSame(results.error.percentiles, {})
+        ok(!results.error.success)
+        ok(results.error.error instanceof Error)
+        deepStrictEqual(results.error.error.message, 'FAILED')
+        deepStrictEqual(results.error.size, 0)
+        deepStrictEqual(results.error.min, 0)
+        deepStrictEqual(results.error.max, 0)
+        deepStrictEqual(results.error.mean, 0)
+        deepStrictEqual(results.error.stddev, 0)
+        deepStrictEqual(results.error.standardError, 0)
+        deepStrictEqual(results.error.percentiles, {})
         delete results.error
 
         for (const entry of Object.values(results)) {
-          t.ok(entry.success)
-          t.type(entry.error, 'undefined')
-          t.equal(entry.size, 10)
-          t.type(entry.min, 'number')
-          t.type(entry.max, 'number')
-          t.type(entry.mean, 'number')
-          t.type(entry.stddev, 'number')
-          t.type(entry.standardError, 'number')
+          ok(entry.success)
+          ifError(entry.error)
+          deepStrictEqual(entry.size, 10)
+          ok(typeof entry.min, 'number')
+          ok(typeof entry.max, 'number')
+          ok(typeof entry.mean, 'number')
+          ok(typeof entry.stddev, 'number')
+          ok(typeof entry.standardError, 'number')
 
           for (const percentile of percentiles) {
-            t.type(entry.percentiles[percentile.toString()], 'number')
+            ok(typeof entry.percentiles[percentile.toString()], 'number')
           }
         }
 
-        const output = removeStyle(logger.calls[0].args[0 as number]!)
-        t.match(output, /║\s+Slower tests\s+|\s+Samples\s+|\s+Result\s+|\s+Tolerance\s+║/)
-        t.match(output, /║\s+Faster test\s+|\s+Samples\s+|\s+Result\s+|\s+Tolerance\s+║/)
-        t.match(output, /║\s+(single|multiple)\s+|\s+10\s+|\s+\d+\.\d{2}\sop\/sec\s+|\s+±\s\d+.\d{2}\s%\s+║/)
-        t.match(output, /║\s+(error)\s+|\s+0\s+|\s+Errored\s+|\s+N\/A\s+║/)
-        t.end()
+        const output = removeStyle(logger.mock.calls[0].arguments[0] as string)
+        match(output, /║\s+Slower tests\s+|\s+Samples\s+|\s+Result\s+|\s+Tolerance\s+║/)
+        match(output, /║\s+Faster test\s+|\s+Samples\s+|\s+Result\s+|\s+Tolerance\s+║/)
+        match(output, /║\s+(single|multiple)\s+|\s+10\s+|\s+\d+\.\d{2}\sop\/sec\s+|\s+±\s\d+.\d{2}\s%\s+║/)
+        match(output, /║\s+(error)\s+|\s+0\s+|\s+Errored\s+|\s+N\/A\s+║/)
+        done()
       }
     )
   })
 
-  t.test('Printing - No colors', t => {
-    const logger = t.captureFn(loggerBase)
+  test('Printing - No colors', (t, done) => {
+    const logger = t.mock.fn()
     setLogger(logger)
 
     cronometro(
@@ -105,20 +104,19 @@ if (!isMainThread) {
       },
       { print: { colors: false } },
       err => {
-        t.equal(err, null)
+        ifError(err)
 
-        const output = removeStyle(logger.calls[0].args[0 as number]!)
+        const output = removeStyle(logger.mock.calls[0].arguments[0] as string)
 
         // eslint-disable-next-line no-control-regex
-        t.notMatch(output, /\u001B/)
-
-        t.end()
+        ok(!output.match(/\u001B/))
+        done()
       }
     )
   })
 
-  t.test('Printing - Base compare', t => {
-    const logger = t.captureFn(loggerBase)
+  test('Printing - Base compare', (t, done) => {
+    const logger = t.mock.fn()
     setLogger(logger)
 
     cronometro(
@@ -135,24 +133,24 @@ if (!isMainThread) {
       },
       { print: { compare: true } },
       err => {
-        t.equal(err, null)
+        ifError(err)
 
-        const output = removeStyle(logger.calls[0].args[0 as number]!)
-        t.match(output, /║\s+Slower tests\s+|\s+Samples\s+|\s+Result\s+|\s+Tolerance\s+|\s+Difference with slowest║/)
-        t.match(output, /║\s+Fastest test\s+|\s+Samples\s+|\s+Result\s+|\s+Tolerance\s+|\s+Difference with slowest║/)
-        t.match(output, /║\s+(single|multiple)\s+|\s+10\s+|\s+\d+\.\d{2}\sop\/sec\s+|\s+±\s\d+.\d{2}\s%\s+|\s+║/)
-        t.match(
+        const output = removeStyle(logger.mock.calls[0].arguments[0] as string)
+        match(output, /║\s+Slower tests\s+|\s+Samples\s+|\s+Result\s+|\s+Tolerance\s+|\s+Difference with slowest║/)
+        match(output, /║\s+Fastest test\s+|\s+Samples\s+|\s+Result\s+|\s+Tolerance\s+|\s+Difference with slowest║/)
+        match(output, /║\s+(single|multiple)\s+|\s+10\s+|\s+\d+\.\d{2}\sop\/sec\s+|\s+±\s\d+.\d{2}\s%\s+|\s+║/)
+        match(
           output,
           /║\s+(single|multiple)\s+|\s+10\s+|\s+\d+\.\d{2}\sop\/sec\s+|\s+±\s\d+.\d{2}\s%\s+|\s+\\+\s+\d+.\d{2}\s%\s+║/
         )
-        t.match(output, /║\s+(error)\s+|\s+0\s+|\s+Errored\s+|\s+N\/A\s+|\s+N\/A\s+║/)
-        t.end()
+        match(output, /║\s+(error)\s+|\s+0\s+|\s+Errored\s+|\s+N\/A\s+|\s+N\/A\s+║/)
+        done()
       }
     )
   })
 
-  t.test('Printing - Previous compare', t => {
-    const logger = t.captureFn(loggerBase)
+  test('Printing - Previous compare', (t, done) => {
+    const logger = t.mock.fn()
     setLogger(logger)
 
     cronometro(
@@ -169,21 +167,18 @@ if (!isMainThread) {
       },
       { print: { compare: true, compareMode: 'previous' } },
       err => {
-        t.equal(err, null)
+        ifError(err)
 
-        const output = removeStyle(logger.calls[0].args[0 as number]!)
-        t.match(
-          output,
-          /║\s+Slower tests\s+|\s+Samples\s+|\s+Result\s+|\s+Tolerance\s+|\s+Difference with previous\s+║/
-        )
-        t.match(output, /║\s+Faster test\s+|\s+Samples\s+|\s+Result\s+|\s+Tolerance\s+|\s+Difference with previous\s+║/)
-        t.match(output, /║\s+(single|multiple)\s+|\s+10\s+|\s+\d+\.\d{2}\sop\/sec\s+|\s+±\s\d+.\d{2}\s%\s+|\s+║/)
-        t.match(
+        const output = removeStyle(logger.mock.calls[0].arguments[0] as string)
+        match(output, /║\s+Slower tests\s+|\s+Samples\s+|\s+Result\s+|\s+Tolerance\s+|\s+Difference with previous\s+║/)
+        match(output, /║\s+Faster test\s+|\s+Samples\s+|\s+Result\s+|\s+Tolerance\s+|\s+Difference with previous\s+║/)
+        match(output, /║\s+(single|multiple)\s+|\s+10\s+|\s+\d+\.\d{2}\sop\/sec\s+|\s+±\s\d+.\d{2}\s%\s+|\s+║/)
+        match(
           output,
           /║\s+(single|multiple)\s+|\s+10\s+|\s+\d+\.\d{2}\sop\/sec\s+|\s+±\s\d+.\d{2}\s%\s+|\s+\\+\s+\d+.\d{2}\s%\s+║/
         )
-        t.match(output, /║\s+(error)\s+|\s+0\s+|\s+Errored\s+|\s+N\/A\s+|\s+N\/A\s+║/)
-        t.end()
+        match(output, /║\s+(error)\s+|\s+0\s+|\s+Errored\s+|\s+N\/A\s+|\s+N\/A\s+║/)
+        done()
       }
     )
   })

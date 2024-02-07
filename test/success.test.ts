@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-
+import { deepStrictEqual, ifError, ok } from 'node:assert'
+import { test } from 'node:test'
 import { isMainThread } from 'node:worker_threads'
-import t from 'tap'
 import { cronometro, percentiles } from '../src/index.js'
 
 if (!isMainThread) {
@@ -18,7 +17,7 @@ if (!isMainThread) {
     () => false
   )
 } else {
-  t.test('Collecting results', async t => {
+  await test('Collecting results', async () => {
     const results = await cronometro(
       {
         single() {
@@ -32,20 +31,20 @@ if (!isMainThread) {
       { iterations: 10, print: false }
     )
 
-    t.strictSame(Object.keys(results), ['single', 'multiple'])
+    deepStrictEqual(Object.keys(results), ['single', 'multiple'])
 
     for (const entry of Object.values(results)) {
-      t.ok(entry.success)
-      t.type(entry.error, 'undefined')
-      t.equal(entry.size, 10)
-      t.type(entry.min, 'number')
-      t.type(entry.max, 'number')
-      t.type(entry.mean, 'number')
-      t.type(entry.stddev, 'number')
-      t.type(entry.standardError, 'number')
+      ok(entry.success)
+      ifError(entry.error)
+      deepStrictEqual(entry.size, 10)
+      ok(typeof entry.min, 'number')
+      ok(typeof entry.max, 'number')
+      ok(typeof entry.mean, 'number')
+      ok(typeof entry.stddev, 'number')
+      ok(typeof entry.standardError, 'number')
 
       for (const percentile of percentiles) {
-        t.type(entry.percentiles[percentile.toString()], 'number')
+        ok(typeof entry.percentiles[percentile.toString()], 'number')
       }
     }
   })

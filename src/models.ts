@@ -8,8 +8,10 @@ export interface PrintOptions {
   compareMode?: 'base' | 'previous'
 }
 
+export type SetupFunctionCallback = (err?: Error | null) => void
+
 // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-export type SetupFunction = (cb: (err?: Error | null) => void) => Promise<any> | void
+export type SetupFunction = (cb: SetupFunctionCallback) => Promise<any> | void
 
 export interface Options {
   iterations: number
@@ -33,8 +35,6 @@ export interface Test {
   after?: SetupFunction
 }
 
-export type Callback = (err: Error | null, results: Results) => any
-
 export type Percentiles = Record<string, number>
 
 export interface Result {
@@ -48,6 +48,8 @@ export interface Result {
   standardError: number
   percentiles: Percentiles
 }
+
+export type Callback = (err: Error | null, results: Results) => any
 
 export type Tests = Record<string, TestFunction | Test>
 
@@ -98,4 +100,10 @@ export const defaultOptions = {
 
 export const percentiles = [0.001, 0.01, 0.1, 1, 2.5, 10, 25, 50, 75, 90, 97.5, 99, 99.9, 99.99, 99.999]
 
-export const runnerPath = resolve(import.meta.url.replace('file://', '').replace(/models.(js|ts)/, ''), './runner.js')
+export const runnerPath = resolve(
+  import.meta.url
+    .replace('file://', '')
+    .replace('/src/', '/dist/')
+    .replace(/models.(js|ts)/, ''),
+  './runner.js'
+)

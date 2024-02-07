@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 
-import t from 'tap'
+import { deepStrictEqual, ok, rejects } from 'node:assert'
+import { test } from 'node:test'
 import { cronometro } from '../src/index.js'
 
-t.test('Options validation', async t => {
-  await t.rejects(
+test('Options validation', async () => {
+  await rejects(
     () =>
       cronometro(
         {
@@ -33,8 +34,8 @@ t.test('Options validation', async t => {
     },
     { errorThreshold: -1 },
     err => {
-      t.type(err, 'Error')
-      t.equal(err!.message, 'The errorThreshold option must be a number between 0 and 100.')
+      ok(err instanceof Error)
+      deepStrictEqual(err.message, 'The errorThreshold option must be a number between 0 and 100.')
     }
   )
 
@@ -50,8 +51,8 @@ t.test('Options validation', async t => {
     },
     { onTestStart: 1 as any },
     err => {
-      t.type(err, 'Error')
-      t.equal(err!.message, 'The onTestStart option must be a function.')
+      ok(err instanceof Error)
+      deepStrictEqual(err.message, 'The onTestStart option must be a function.')
     }
   )
 
@@ -67,8 +68,8 @@ t.test('Options validation', async t => {
     },
     { onTestEnd: 1 as any },
     err => {
-      t.type(err, 'Error')
-      t.equal(err!.message, 'The onTestEnd option must be a function.')
+      ok(err instanceof Error)
+      deepStrictEqual(err.message, 'The onTestEnd option must be a function.')
     }
   )
 
@@ -84,8 +85,8 @@ t.test('Options validation', async t => {
     },
     { onTestError: 1 as any },
     err => {
-      t.type(err, 'Error')
-      t.equal(err!.message, 'The onTestError option must be a function.')
+      ok(err instanceof Error)
+      deepStrictEqual(err.message, 'The onTestError option must be a function.')
     }
   )
 })

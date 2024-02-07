@@ -1,13 +1,12 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-
+import { deepStrictEqual, ok } from 'node:assert'
+import { test } from 'node:test'
 import { isMainThread } from 'node:worker_threads'
-import t from 'tap'
 import { cronometro, type Tests } from '../src/index.js'
 
 if (!isMainThread) {
   cronometro(undefined as unknown as Tests, () => false)
 } else {
-  t.test('Generic error handling', async t => {
+  await test('Generic error handling', async () => {
     const results = await cronometro(
       {
         single() {
@@ -20,12 +19,12 @@ if (!isMainThread) {
       { iterations: 10, print: false }
     )
 
-    t.notOk(results.single.success)
-    t.type(results.single.error, Error)
-    t.equal(results.single.error!.message, 'Cannot convert undefined or null to object')
+    ok(!results.single.success)
+    ok(results.single.error instanceof Error)
+    deepStrictEqual(results.single.error.message, 'Cannot convert undefined or null to object')
 
-    t.notOk(results.single.success)
-    t.type(results.single.error, Error)
-    t.equal(results.single.error!.message, 'Cannot convert undefined or null to object')
+    ok(!results.single.success)
+    ok(results.single.error instanceof Error)
+    deepStrictEqual(results.single.error.message, 'Cannot convert undefined or null to object')
   })
 }

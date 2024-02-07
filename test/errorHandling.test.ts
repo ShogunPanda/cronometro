@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 
+import { deepStrictEqual, ifError, ok, rejects } from 'node:assert'
+import { test } from 'node:test'
 import { isMainThread } from 'node:worker_threads'
-import t from 'tap'
 import { cronometro, percentiles } from '../src/index.js'
 
 if (!isMainThread) {
@@ -17,7 +18,7 @@ if (!isMainThread) {
     () => false
   )
 } else {
-  t.test('Errored tests handling', async t => {
+  test('Errored tests handling', async () => {
     const results = await cronometro(
       {
         single() {
@@ -30,38 +31,38 @@ if (!isMainThread) {
       { iterations: 10, print: false }
     )
 
-    t.strictSame(Object.keys(results), ['single', 'multiple'])
+    deepStrictEqual(Object.keys(results), ['single', 'multiple'])
 
-    t.ok(results.single.success)
-    t.type(results.single.error, 'undefined')
-    t.equal(results.single.size, 10)
-    t.type(results.single.min, 'number')
-    t.type(results.single.max, 'number')
-    t.type(results.single.mean, 'number')
-    t.type(results.single.stddev, 'number')
-    t.type(results.single.standardError, 'number')
+    ok(results.single.success)
+    ifError(results.single.error)
+    deepStrictEqual(results.single.size, 10)
+    deepStrictEqual(typeof results.single.min, 'number')
+    deepStrictEqual(typeof results.single.max, 'number')
+    deepStrictEqual(typeof results.single.mean, 'number')
+    deepStrictEqual(typeof results.single.stddev, 'number')
+    deepStrictEqual(typeof results.single.standardError, 'number')
 
     for (const percentile of percentiles) {
-      t.type(results.single.percentiles[percentile.toString()], 'number')
+      ok(typeof results.single.percentiles[percentile.toString()], 'number')
     }
 
-    t.notOk(results.multiple.success)
-    t.type(results.multiple.error, Error)
-    t.equal(results.multiple.error!.message, 'FAILED')
-    t.equal(results.multiple.size, 0)
-    t.equal(results.multiple.min, 0)
-    t.equal(results.multiple.max, 0)
-    t.equal(results.multiple.mean, 0)
-    t.equal(results.multiple.stddev, 0)
-    t.equal(results.multiple.standardError, 0)
-    t.strictSame(results.multiple.percentiles, {})
+    ok(!results.multiple.success)
+    ok(results.multiple.error instanceof Error)
+    deepStrictEqual(results.multiple.error.message, 'FAILED')
+    deepStrictEqual(results.multiple.size, 0)
+    deepStrictEqual(results.multiple.min, 0)
+    deepStrictEqual(results.multiple.max, 0)
+    deepStrictEqual(results.multiple.mean, 0)
+    deepStrictEqual(results.multiple.stddev, 0)
+    deepStrictEqual(results.multiple.standardError, 0)
+    deepStrictEqual(results.multiple.percentiles, {})
   })
 
-  t.test('Runner cannot be run in main thread', async t => {
-    await t.rejects(import('../src/runner.js'), { message: 'Do not run this file as main script.' })
+  test('Runner cannot be run in main thread', async () => {
+    await rejects(import('../src/runner.js'), { message: 'Do not run this file as main script.' })
   })
 
-  t.test('Runner reports setup errors', async t => {
+  test('Runner reports setup errors', async () => {
     const results = await cronometro(
       {
         notDefined() {
@@ -71,6 +72,6 @@ if (!isMainThread) {
       { iterations: 10, print: false }
     )
 
-    t.strictSame(Object.keys(results), ['notDefined'])
+    deepStrictEqual(Object.keys(results), ['notDefined'])
   })
 }

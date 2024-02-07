@@ -1,12 +1,12 @@
 import { isMainThread, Worker, workerData } from 'node:worker_threads'
 import {
   defaultOptions,
-  type Result,
   runnerPath,
   type Callback,
   type Context,
   type Options,
   type PrintOptions,
+  type Result,
   type Results,
   type Tests
 } from './models.js'

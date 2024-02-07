@@ -101,11 +101,13 @@ function runTestIteration(context: TestContext): void {
       context.handler(null)
     }
   } catch (error) {
+    /* c8 ignore start */
     // If a error was thrown, only handle if the original function length is 0, which means it's a sync error, otherwise propagate
     if (context.test.length === 0) {
       context.handler(error as Error)
       return
     }
+    /* c8 ignore end */
 
     throw error
   }

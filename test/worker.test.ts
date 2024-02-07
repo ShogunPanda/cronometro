@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
-import t from 'tap'
+
+import { deepStrictEqual, ifError, ok } from 'node:assert'
+import { test } from 'node:test'
 import { percentiles, type AsyncTest, type Result } from '../src/index.js'
 import { runWorker } from '../src/worker.js'
 
-t.test('Worker execution - Handle sync functions that succeed', t => {
+test('Worker execution - Handle sync functions that succeed', (t, done) => {
   let mainCalls = 0
-  const notifier = t.captureFn(() => {})
+  const notifier = t.mock.fn()
 
   function main(): void {
     mainCalls++
@@ -22,32 +24,32 @@ t.test('Worker execution - Handle sync functions that succeed', t => {
     },
     notifier,
     code => {
-      t.equal(code, 0)
-      t.ok(mainCalls > 0)
+      deepStrictEqual(code, 0)
+      ok(mainCalls > 0)
 
-      const result = notifier.calls[0].args[0 as number]! as Result
+      const result = notifier.mock.calls[0].arguments[0] as Result
 
-      t.ok(result.success)
-      t.type(result.error, 'undefined')
-      t.equal(result.size, 1000)
-      t.type(result.min, 'number')
-      t.type(result.max, 'number')
-      t.type(result.mean, 'number')
-      t.type(result.stddev, 'number')
-      t.type(result.standardError, 'number')
+      ok(result.success)
+      ifError(result.error)
+      deepStrictEqual(result.size, 1000)
+      ok(typeof result.min, 'number')
+      ok(typeof result.max, 'number')
+      ok(typeof result.mean, 'number')
+      ok(typeof result.stddev, 'number')
+      ok(typeof result.standardError, 'number')
 
       for (const percentile of percentiles) {
-        t.type(result.percentiles[percentile.toString()], 'number')
+        ok(typeof result.percentiles[percentile.toString()], 'number')
       }
 
-      t.end()
+      done()
     }
   )
 })
 
-t.test('Worker execution - Handle sync functions that throw errors', t => {
+test('Worker execution - Handle sync functions that throw errors', (t, done) => {
   let mainCalls = 0
-  const notifier = t.captureFn(() => {})
+  const notifier = t.mock.fn()
 
   /* eslint-disable-next-line @typescript-eslint/require-await */
   async function main(): Promise<void> {
@@ -66,30 +68,30 @@ t.test('Worker execution - Handle sync functions that throw errors', t => {
     },
     notifier,
     code => {
-      t.equal(code, 1)
-      t.ok(mainCalls > 0)
+      deepStrictEqual(code, 1)
+      ok(mainCalls > 0)
 
-      const result = notifier.calls[0].args[0 as number]! as Result
+      const result = notifier.mock.calls[0].arguments[0] as Result
 
-      t.notOk(result.success)
-      t.type(result.error, Error)
-      t.equal(result.error!.message, 'FAILED')
-      t.equal(result.size, 0)
-      t.equal(result.min, 0)
-      t.equal(result.max, 0)
-      t.equal(result.mean, 0)
-      t.equal(result.stddev, 0)
-      t.equal(result.standardError, 0)
-      t.strictSame(result.percentiles, {})
+      ok(!result.success)
+      ok(result.error instanceof Error)
+      deepStrictEqual(result.error.message, 'FAILED')
+      deepStrictEqual(result.size, 0)
+      deepStrictEqual(result.min, 0)
+      deepStrictEqual(result.max, 0)
+      deepStrictEqual(result.mean, 0)
+      deepStrictEqual(result.stddev, 0)
+      deepStrictEqual(result.standardError, 0)
+      deepStrictEqual(result.percentiles, {})
 
-      t.end()
+      done()
     }
   )
 })
 
-t.test('Worker execution - Handle callback functions that succeed', t => {
+test('Worker execution - Handle callback functions that succeed', (t, done) => {
   let mainCalls = 0
-  const notifier = t.captureFn(() => {})
+  const notifier = t.mock.fn()
 
   function main(cb: (err?: Error) => void): void {
     mainCalls++
@@ -108,32 +110,32 @@ t.test('Worker execution - Handle callback functions that succeed', t => {
     },
     notifier,
     code => {
-      t.equal(code, 0)
-      t.ok(mainCalls > 0)
+      deepStrictEqual(code, 0)
+      ok(mainCalls > 0)
 
-      const result = notifier.calls[0].args[0 as number]! as Result
+      const result = notifier.mock.calls[0].arguments[0] as Result
 
-      t.ok(result.success)
-      t.type(result.error, 'undefined')
-      t.equal(result.size, 10_000)
-      t.type(result.min, 'number')
-      t.type(result.max, 'number')
-      t.type(result.mean, 'number')
-      t.type(result.stddev, 'number')
-      t.type(result.standardError, 'number')
+      ok(result.success)
+      ifError(result.error)
+      deepStrictEqual(result.size, 10_000)
+      ok(typeof result.min, 'number')
+      ok(typeof result.max, 'number')
+      ok(typeof result.mean, 'number')
+      ok(typeof result.stddev, 'number')
+      ok(typeof result.standardError, 'number')
 
       for (const percentile of percentiles) {
-        t.type(result.percentiles[percentile.toString()], 'number')
+        ok(typeof result.percentiles[percentile.toString()], 'number')
       }
 
-      t.end()
+      done()
     }
   )
 })
 
-t.test('Worker execution - Handle callback functions that throw errors', t => {
+test('Worker execution - Handle callback functions that throw errors', (t, done) => {
   let mainCalls = 0
-  const notifier = t.captureFn(() => {})
+  const notifier = t.mock.fn()
 
   function main(cb: (err?: Error) => void): void {
     mainCalls++
@@ -152,30 +154,30 @@ t.test('Worker execution - Handle callback functions that throw errors', t => {
     },
     notifier,
     code => {
-      t.equal(code, 1)
-      t.ok(mainCalls > 0)
+      deepStrictEqual(code, 1)
+      ok(mainCalls > 0)
 
-      const result = notifier.calls[0].args[0 as number]! as Result
+      const result = notifier.mock.calls[0].arguments[0] as Result
 
-      t.notOk(result.success)
-      t.type(result.error, Error)
-      t.equal(result.error!.message, 'FAILED')
-      t.equal(result.size, 0)
-      t.equal(result.min, 0)
-      t.equal(result.max, 0)
-      t.equal(result.mean, 0)
-      t.equal(result.stddev, 0)
-      t.equal(result.standardError, 0)
-      t.strictSame(result.percentiles, {})
+      ok(!result.success)
+      ok(result.error instanceof Error)
+      deepStrictEqual(result.error.message, 'FAILED')
+      deepStrictEqual(result.size, 0)
+      deepStrictEqual(result.min, 0)
+      deepStrictEqual(result.max, 0)
+      deepStrictEqual(result.mean, 0)
+      deepStrictEqual(result.stddev, 0)
+      deepStrictEqual(result.standardError, 0)
+      deepStrictEqual(result.percentiles, {})
 
-      t.end()
+      done()
     }
   )
 })
 
-t.test('Worker execution - Handle promise functions that resolve', t => {
+test('Worker execution - Handle promise functions that resolve', (t, done) => {
   let mainCalls = 0
-  const notifier = t.captureFn(() => {})
+  const notifier = t.mock.fn()
 
   /* eslint-disable-next-line @typescript-eslint/require-await */
   async function main(): Promise<void> {
@@ -194,32 +196,32 @@ t.test('Worker execution - Handle promise functions that resolve', t => {
     },
     notifier,
     code => {
-      t.equal(code, 0)
-      t.ok(mainCalls > 0)
+      deepStrictEqual(code, 0)
+      ok(mainCalls > 0)
 
-      const result = notifier.calls[0].args[0 as number]! as Result
+      const result = notifier.mock.calls[0].arguments[0] as Result
 
-      t.ok(result.success)
-      t.type(result.error, 'undefined')
-      t.equal(result.size, 5)
-      t.type(result.min, 'number')
-      t.type(result.max, 'number')
-      t.type(result.mean, 'number')
-      t.type(result.stddev, 'number')
-      t.type(result.standardError, 'number')
+      ok(result.success)
+      ifError(result.error)
+      deepStrictEqual(result.size, 5)
+      ok(typeof result.min, 'number')
+      ok(typeof result.max, 'number')
+      ok(typeof result.mean, 'number')
+      ok(typeof result.stddev, 'number')
+      ok(typeof result.standardError, 'number')
 
       for (const percentile of percentiles) {
-        t.type(result.percentiles[percentile.toString()], 'number')
+        ok(typeof result.percentiles[percentile.toString()], 'number')
       }
 
-      t.end()
+      done()
     }
   )
 })
 
-t.test('Worker execution - Handle promise functions that reject', t => {
+test('Worker execution - Handle promise functions that reject', (t, done) => {
   let mainCalls = 0
-  const notifier = t.captureFn(() => {})
+  const notifier = t.mock.fn()
 
   /* eslint-disable-next-line @typescript-eslint/require-await */
   async function main(): Promise<void> {
@@ -239,30 +241,30 @@ t.test('Worker execution - Handle promise functions that reject', t => {
     },
     notifier,
     code => {
-      t.equal(code, 1)
-      t.ok(mainCalls > 0)
+      deepStrictEqual(code, 1)
+      ok(mainCalls > 0)
 
-      const result = notifier.calls[0].args[0 as number]! as Result
+      const result = notifier.mock.calls[0].arguments[0] as Result
 
-      t.notOk(result.success)
-      t.type(result.error, Error)
-      t.equal(result.error!.message, 'FAILED')
-      t.equal(result.size, 0)
-      t.equal(result.min, 0)
-      t.equal(result.max, 0)
-      t.equal(result.mean, 0)
-      t.equal(result.stddev, 0)
-      t.equal(result.standardError, 0)
-      t.strictSame(result.percentiles, {})
+      ok(!result.success)
+      ok(result.error instanceof Error)
+      deepStrictEqual(result.error.message, 'FAILED')
+      deepStrictEqual(result.size, 0)
+      deepStrictEqual(result.min, 0)
+      deepStrictEqual(result.max, 0)
+      deepStrictEqual(result.mean, 0)
+      deepStrictEqual(result.stddev, 0)
+      deepStrictEqual(result.standardError, 0)
+      deepStrictEqual(result.percentiles, {})
 
-      t.end()
+      done()
     }
   )
 })
 
-t.test('Worker execution - Handle warmup mode enabled', t => {
+test('Worker execution - Handle warmup mode enabled', (t, done) => {
   let mainCalls = 0
-  const notifier = t.captureFn(() => {})
+  const notifier = t.mock.fn()
 
   function main(): void {
     mainCalls++
@@ -280,33 +282,33 @@ t.test('Worker execution - Handle warmup mode enabled', t => {
     },
     notifier,
     code => {
-      t.equal(code, 0)
-      t.equal(mainCalls, 10)
-      t.equal(notifier.calls.length, 1)
+      deepStrictEqual(code, 0)
+      deepStrictEqual(mainCalls, 10)
+      deepStrictEqual(notifier.mock.callCount(), 1)
 
-      const result = notifier.calls[0].args[0 as number]! as Result
+      const result = notifier.mock.calls[0].arguments[0] as Result
 
-      t.ok(result.success)
-      t.type(result.error, 'undefined')
-      t.equal(result.size, 5)
-      t.type(result.min, 'number')
-      t.type(result.max, 'number')
-      t.type(result.mean, 'number')
-      t.type(result.stddev, 'number')
-      t.type(result.standardError, 'number')
+      ok(result.success)
+      ifError(result.error)
+      deepStrictEqual(result.size, 5)
+      ok(typeof result.min, 'number')
+      ok(typeof result.max, 'number')
+      ok(typeof result.mean, 'number')
+      ok(typeof result.stddev, 'number')
+      ok(typeof result.standardError, 'number')
 
       for (const percentile of percentiles) {
-        t.type(result.percentiles[percentile.toString()], 'number')
+        ok(typeof result.percentiles[percentile.toString()], 'number')
       }
 
-      t.end()
+      done()
     }
   )
 })
 
-t.test('Worker execution - Handle warmup mode disabled', t => {
+test('Worker execution - Handle warmup mode disabled', (t, done) => {
   let mainCalls = 0
-  const notifier = t.captureFn(() => {})
+  const notifier = t.mock.fn()
 
   function main(): void {
     mainCalls++
@@ -324,34 +326,34 @@ t.test('Worker execution - Handle warmup mode disabled', t => {
     },
     notifier,
     code => {
-      t.equal(code, 0)
-      t.equal(mainCalls, 5)
-      t.equal(notifier.calls.length, 1)
+      deepStrictEqual(code, 0)
+      deepStrictEqual(mainCalls, 5)
+      deepStrictEqual(notifier.mock.callCount(), 1)
 
-      const result = notifier.calls[0].args[0 as number]! as Result
+      const result = notifier.mock.calls[0].arguments[0] as Result
 
-      t.ok(result.success)
-      t.type(result.error, 'undefined')
-      t.equal(result.size, 5)
-      t.type(result.min, 'number')
-      t.type(result.max, 'number')
-      t.type(result.mean, 'number')
-      t.type(result.stddev, 'number')
-      t.type(result.standardError, 'number')
+      ok(result.success)
+      ifError(result.error)
+      deepStrictEqual(result.size, 5)
+      ok(typeof result.min, 'number')
+      ok(typeof result.max, 'number')
+      ok(typeof result.mean, 'number')
+      ok(typeof result.stddev, 'number')
+      ok(typeof result.standardError, 'number')
 
       for (const percentile of percentiles) {
-        t.type(result.percentiles[percentile.toString()], 'number')
+        ok(typeof result.percentiles[percentile.toString()], 'number')
       }
 
-      t.end()
+      done()
     }
   )
 })
 
-t.test('Worker setup - Handle callback before functions', t => {
+test('Worker setup - Handle callback before functions', (t, done) => {
   let mainCalls = 0
   let setupCalls = 0
-  const notifier = t.captureFn(() => {})
+  const notifier = t.mock.fn()
 
   function main(): void {
     mainCalls++
@@ -379,34 +381,34 @@ t.test('Worker setup - Handle callback before functions', t => {
     },
     notifier,
     code => {
-      t.equal(code, 0)
-      t.equal(setupCalls, 1)
-      t.ok(mainCalls > 0)
-      t.equal(notifier.calls.length, 1)
+      deepStrictEqual(code, 0)
+      deepStrictEqual(setupCalls, 1)
+      ok(mainCalls > 0)
+      deepStrictEqual(notifier.mock.callCount(), 1)
 
-      const result = notifier.calls[0].args[0 as number]! as Result
+      const result = notifier.mock.calls[0].arguments[0] as Result
 
-      t.ok(result.success)
-      t.type(result.error, 'undefined')
-      t.equal(result.size, 1000)
-      t.type(result.min, 'number')
-      t.type(result.max, 'number')
-      t.type(result.mean, 'number')
-      t.type(result.stddev, 'number')
-      t.type(result.standardError, 'number')
+      ok(result.success)
+      ifError(result.error)
+      deepStrictEqual(result.size, 1000)
+      ok(typeof result.min, 'number')
+      ok(typeof result.max, 'number')
+      ok(typeof result.mean, 'number')
+      ok(typeof result.stddev, 'number')
+      ok(typeof result.standardError, 'number')
 
       for (const percentile of percentiles) {
-        t.type(result.percentiles[percentile.toString()], 'number')
+        ok(typeof result.percentiles[percentile.toString()], 'number')
       }
 
-      t.end()
+      done()
     }
   )
 })
 
-t.test('Worker setup - Handle callback before functions that throw errors', t => {
+test('Worker setup - Handle callback before functions that throw errors', (t, done) => {
   let mainCalls = 0
-  const notifier = t.captureFn(() => {})
+  const notifier = t.mock.fn()
 
   function main(): void {
     mainCalls++
@@ -433,31 +435,31 @@ t.test('Worker setup - Handle callback before functions that throw errors', t =>
     },
     notifier,
     code => {
-      t.equal(code, 1)
-      t.notOk(mainCalls)
+      deepStrictEqual(code, 1)
+      ok(!mainCalls)
 
-      const result = notifier.calls[0].args[0 as number]! as Result
+      const result = notifier.mock.calls[0].arguments[0] as Result
 
-      t.notOk(result.success)
-      t.type(result.error, Error)
-      t.equal(result.error!.message, 'FAILED')
-      t.equal(result.size, 0)
-      t.equal(result.min, 0)
-      t.equal(result.max, 0)
-      t.equal(result.mean, 0)
-      t.equal(result.stddev, 0)
-      t.equal(result.standardError, 0)
-      t.strictSame(result.percentiles, {})
+      ok(!result.success)
+      ok(result.error instanceof Error)
+      deepStrictEqual(result.error.message, 'FAILED')
+      deepStrictEqual(result.size, 0)
+      deepStrictEqual(result.min, 0)
+      deepStrictEqual(result.max, 0)
+      deepStrictEqual(result.mean, 0)
+      deepStrictEqual(result.stddev, 0)
+      deepStrictEqual(result.standardError, 0)
+      deepStrictEqual(result.percentiles, {})
 
-      t.end()
+      done()
     }
   )
 })
 
-t.test('Worker setup - Handle promise before functions that resolve', t => {
+test('Worker setup - Handle promise before functions that resolve', (t, done) => {
   let mainCalls = 0
   let setupCalls = 0
-  const notifier = t.captureFn(() => {})
+  const notifier = t.mock.fn()
 
   function main(): void {
     mainCalls++
@@ -485,34 +487,34 @@ t.test('Worker setup - Handle promise before functions that resolve', t => {
     },
     notifier,
     code => {
-      t.equal(code, 0)
-      t.equal(setupCalls, 1)
-      t.ok(mainCalls > 0)
-      t.equal(notifier.calls.length, 1)
+      deepStrictEqual(code, 0)
+      deepStrictEqual(setupCalls, 1)
+      ok(mainCalls > 0)
+      deepStrictEqual(notifier.mock.callCount(), 1)
 
-      const result = notifier.calls[0].args[0 as number]! as Result
+      const result = notifier.mock.calls[0].arguments[0] as Result
 
-      t.ok(result.success)
-      t.type(result.error, 'undefined')
-      t.equal(result.size, 1000)
-      t.type(result.min, 'number')
-      t.type(result.max, 'number')
-      t.type(result.mean, 'number')
-      t.type(result.stddev, 'number')
-      t.type(result.standardError, 'number')
+      ok(result.success)
+      ifError(result.error)
+      deepStrictEqual(result.size, 1000)
+      ok(typeof result.min, 'number')
+      ok(typeof result.max, 'number')
+      ok(typeof result.mean, 'number')
+      ok(typeof result.stddev, 'number')
+      ok(typeof result.standardError, 'number')
 
       for (const percentile of percentiles) {
-        t.type(result.percentiles[percentile.toString()], 'number')
+        ok(typeof result.percentiles[percentile.toString()], 'number')
       }
 
-      t.end()
+      done()
     }
   )
 })
 
-t.test('Worker setup - Handle promise before functions that reject', t => {
+test('Worker setup - Handle promise before functions that reject', (t, done) => {
   let mainCalls = 0
-  const notifier = t.captureFn(() => {})
+  const notifier = t.mock.fn()
 
   function main(): void {
     mainCalls++
@@ -539,31 +541,31 @@ t.test('Worker setup - Handle promise before functions that reject', t => {
     },
     notifier,
     code => {
-      t.equal(code, 1)
-      t.notOk(mainCalls)
+      deepStrictEqual(code, 1)
+      ok(!mainCalls)
 
-      const result = notifier.calls[0].args[0 as number]! as Result
+      const result = notifier.mock.calls[0].arguments[0] as Result
 
-      t.notOk(result.success)
-      t.type(result.error, Error)
-      t.equal(result.error!.message, 'FAILED')
-      t.equal(result.size, 0)
-      t.equal(result.min, 0)
-      t.equal(result.max, 0)
-      t.equal(result.mean, 0)
-      t.equal(result.stddev, 0)
-      t.equal(result.standardError, 0)
-      t.strictSame(result.percentiles, {})
+      ok(!result.success)
+      ok(result.error instanceof Error)
+      deepStrictEqual(result.error.message, 'FAILED')
+      deepStrictEqual(result.size, 0)
+      deepStrictEqual(result.min, 0)
+      deepStrictEqual(result.max, 0)
+      deepStrictEqual(result.mean, 0)
+      deepStrictEqual(result.stddev, 0)
+      deepStrictEqual(result.standardError, 0)
+      deepStrictEqual(result.percentiles, {})
 
-      t.end()
+      done()
     }
   )
 })
 
-t.test('Worker setup - Handle callback after functions', t => {
+test('Worker setup - Handle callback after functions', (t, done) => {
   let mainCalls = 0
   let setupCalls = 0
-  const notifier = t.captureFn(() => {})
+  const notifier = t.mock.fn()
 
   function main(): void {
     mainCalls++
@@ -591,34 +593,34 @@ t.test('Worker setup - Handle callback after functions', t => {
     },
     notifier,
     code => {
-      t.equal(code, 0)
-      t.equal(setupCalls, 1)
-      t.ok(mainCalls > 0)
-      t.equal(notifier.calls.length, 1)
+      deepStrictEqual(code, 0)
+      deepStrictEqual(setupCalls, 1)
+      ok(mainCalls > 0)
+      deepStrictEqual(notifier.mock.callCount(), 1)
 
-      const result = notifier.calls[0].args[0 as number]! as Result
+      const result = notifier.mock.calls[0].arguments[0] as Result
 
-      t.ok(result.success)
-      t.type(result.error, 'undefined')
-      t.equal(result.size, 1000)
-      t.type(result.min, 'number')
-      t.type(result.max, 'number')
-      t.type(result.mean, 'number')
-      t.type(result.stddev, 'number')
-      t.type(result.standardError, 'number')
+      ok(result.success)
+      ifError(result.error)
+      deepStrictEqual(result.size, 1000)
+      ok(typeof result.min, 'number')
+      ok(typeof result.max, 'number')
+      ok(typeof result.mean, 'number')
+      ok(typeof result.stddev, 'number')
+      ok(typeof result.standardError, 'number')
 
       for (const percentile of percentiles) {
-        t.type(result.percentiles[percentile.toString()], 'number')
+        ok(typeof result.percentiles[percentile.toString()], 'number')
       }
 
-      t.end()
+      done()
     }
   )
 })
 
-t.test('Worker setup - Handle callback after functions that throw errors', t => {
+test('Worker setup - Handle callback after functions that throw errors', (t, done) => {
   let mainCalls = 0
-  const notifier = t.captureFn(() => {})
+  const notifier = t.mock.fn()
 
   function main(): void {
     mainCalls++
@@ -645,31 +647,31 @@ t.test('Worker setup - Handle callback after functions that throw errors', t => 
     },
     notifier,
     code => {
-      t.equal(code, 1)
-      t.ok(mainCalls > 0)
+      deepStrictEqual(code, 1)
+      ok(mainCalls > 0)
 
-      const result = notifier.calls[0].args[0 as number]! as Result
+      const result = notifier.mock.calls[0].arguments[0] as Result
 
-      t.notOk(result.success)
-      t.type(result.error, Error)
-      t.equal(result.error!.message, 'FAILED')
-      t.equal(result.size, 0)
-      t.equal(result.min, 0)
-      t.equal(result.max, 0)
-      t.equal(result.mean, 0)
-      t.equal(result.stddev, 0)
-      t.equal(result.standardError, 0)
-      t.strictSame(result.percentiles, {})
+      ok(!result.success)
+      ok(result.error instanceof Error)
+      deepStrictEqual(result.error.message, 'FAILED')
+      deepStrictEqual(result.size, 0)
+      deepStrictEqual(result.min, 0)
+      deepStrictEqual(result.max, 0)
+      deepStrictEqual(result.mean, 0)
+      deepStrictEqual(result.stddev, 0)
+      deepStrictEqual(result.standardError, 0)
+      deepStrictEqual(result.percentiles, {})
 
-      t.end()
+      done()
     }
   )
 })
 
-t.test('Worker setup - Handle promise after functions that resolve', t => {
+test('Worker setup - Handle promise after functions that resolve', (t, done) => {
   let mainCalls = 0
   let setupCalls = 0
-  const notifier = t.captureFn(() => {})
+  const notifier = t.mock.fn()
 
   function main(): void {
     mainCalls++
@@ -697,34 +699,34 @@ t.test('Worker setup - Handle promise after functions that resolve', t => {
     },
     notifier,
     code => {
-      t.equal(code, 0)
-      t.equal(setupCalls, 1)
-      t.ok(mainCalls > 0)
-      t.equal(notifier.calls.length, 1)
+      deepStrictEqual(code, 0)
+      deepStrictEqual(setupCalls, 1)
+      ok(mainCalls > 0)
+      deepStrictEqual(notifier.mock.callCount(), 1)
 
-      const result = notifier.calls[0].args[0 as number]! as Result
+      const result = notifier.mock.calls[0].arguments[0] as Result
 
-      t.ok(result.success)
-      t.type(result.error, 'undefined')
-      t.equal(result.size, 1000)
-      t.type(result.min, 'number')
-      t.type(result.max, 'number')
-      t.type(result.mean, 'number')
-      t.type(result.stddev, 'number')
-      t.type(result.standardError, 'number')
+      ok(result.success)
+      ifError(result.error)
+      deepStrictEqual(result.size, 1000)
+      ok(typeof result.min, 'number')
+      ok(typeof result.max, 'number')
+      ok(typeof result.mean, 'number')
+      ok(typeof result.stddev, 'number')
+      ok(typeof result.standardError, 'number')
 
       for (const percentile of percentiles) {
-        t.type(result.percentiles[percentile.toString()], 'number')
+        ok(typeof result.percentiles[percentile.toString()], 'number')
       }
 
-      t.end()
+      done()
     }
   )
 })
 
-t.test('Worker setup - Handle promise after functions that reject', t => {
+test('Worker setup - Handle promise after functions that reject', (t, done) => {
   let mainCalls = 0
-  const notifier = t.captureFn(() => {})
+  const notifier = t.mock.fn()
 
   function main(): void {
     mainCalls++
@@ -751,29 +753,29 @@ t.test('Worker setup - Handle promise after functions that reject', t => {
     },
     notifier,
     code => {
-      t.equal(code, 1)
-      t.ok(mainCalls > 0)
+      deepStrictEqual(code, 1)
+      ok(mainCalls > 0)
 
-      const result = notifier.calls[0].args[0 as number]! as Result
+      const result = notifier.mock.calls[0].arguments[0] as Result
 
-      t.notOk(result.success)
-      t.type(result.error, Error)
-      t.equal(result.error!.message, 'FAILED')
-      t.equal(result.size, 0)
-      t.equal(result.min, 0)
-      t.equal(result.max, 0)
-      t.equal(result.mean, 0)
-      t.equal(result.stddev, 0)
-      t.equal(result.standardError, 0)
-      t.strictSame(result.percentiles, {})
+      ok(!result.success)
+      ok(result.error instanceof Error)
+      deepStrictEqual(result.error.message, 'FAILED')
+      deepStrictEqual(result.size, 0)
+      deepStrictEqual(result.min, 0)
+      deepStrictEqual(result.max, 0)
+      deepStrictEqual(result.mean, 0)
+      deepStrictEqual(result.stddev, 0)
+      deepStrictEqual(result.standardError, 0)
+      deepStrictEqual(result.percentiles, {})
 
-      t.end()
+      done()
     }
   )
 })
 
-t.test('Worker execution - Handle empty tests', t => {
-  const notifier = t.captureFn(() => {})
+test('Worker execution - Handle empty tests', (t, done) => {
+  const notifier = t.mock.fn()
 
   runWorker(
     {
@@ -786,24 +788,24 @@ t.test('Worker execution - Handle empty tests', t => {
     },
     notifier,
     code => {
-      t.equal(code, 0)
+      deepStrictEqual(code, 0)
 
-      const result = notifier.calls[0].args[0 as number]! as Result
+      const result = notifier.mock.calls[0].arguments[0] as Result
 
-      t.ok(result.success)
-      t.type(result.error, 'undefined')
-      t.equal(result.size, 1000)
-      t.type(result.min, 'number')
-      t.type(result.max, 'number')
-      t.type(result.mean, 'number')
-      t.type(result.stddev, 'number')
-      t.type(result.standardError, 'number')
+      ok(result.success)
+      ifError(result.error)
+      deepStrictEqual(result.size, 1000)
+      ok(typeof result.min, 'number')
+      ok(typeof result.max, 'number')
+      ok(typeof result.mean, 'number')
+      ok(typeof result.stddev, 'number')
+      ok(typeof result.standardError, 'number')
 
       for (const percentile of percentiles) {
-        t.type(result.percentiles[percentile.toString()], 'number')
+        ok(typeof result.percentiles[percentile.toString()], 'number')
       }
 
-      t.end()
+      done()
     }
   )
 })

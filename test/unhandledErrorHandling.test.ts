@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-
+import { deepStrictEqual, ifError, ok } from 'node:assert'
+import { test } from 'node:test'
 import { isMainThread } from 'node:worker_threads'
-import t from 'tap'
-import { type Callback, cronometro, percentiles } from '../src/index.js'
+import { cronometro, percentiles, type Callback } from '../src/index.js'
 
 if (!isMainThread) {
   cronometro(
@@ -21,7 +20,7 @@ if (!isMainThread) {
     () => false
   )
 } else {
-  t.test('Unhandled errored tests handling', async t => {
+  await test('Unhandled errored tests handling', async () => {
     const results = await cronometro(
       {
         single() {
@@ -38,30 +37,30 @@ if (!isMainThread) {
       { iterations: 10, print: false }
     )
 
-    t.strictSame(Object.keys(results), ['single', 'multiple'])
+    deepStrictEqual(Object.keys(results), ['single', 'multiple'])
 
-    t.ok(results.single.success)
-    t.type(results.single.error, 'undefined')
-    t.equal(results.single.size, 10)
-    t.type(results.single.min, 'number')
-    t.type(results.single.max, 'number')
-    t.type(results.single.mean, 'number')
-    t.type(results.single.stddev, 'number')
-    t.type(results.single.standardError, 'number')
+    ok(results.single.success)
+    ifError(results.single.error, 'undefined')
+    deepStrictEqual(results.single.size, 10)
+    ok(typeof results.single.min, 'number')
+    ok(typeof results.single.max, 'number')
+    ok(typeof results.single.mean, 'number')
+    ok(typeof results.single.stddev, 'number')
+    ok(typeof results.single.standardError, 'number')
 
     for (const percentile of percentiles) {
-      t.type(results.single.percentiles[percentile.toString()], 'number')
+      ok(typeof results.single.percentiles[percentile.toString()], 'number')
     }
 
-    t.notOk(results.multiple.success)
-    t.type(results.multiple.error, Error)
-    t.equal(results.multiple.error!.message, 'FAILED')
-    t.equal(results.multiple.size, 0)
-    t.equal(results.multiple.min, 0)
-    t.equal(results.multiple.max, 0)
-    t.equal(results.multiple.mean, 0)
-    t.equal(results.multiple.stddev, 0)
-    t.equal(results.multiple.standardError, 0)
-    t.strictSame(results.multiple.percentiles, {})
+    ok(!results.multiple.success)
+    ok(results.multiple.error instanceof Error)
+    deepStrictEqual(results.multiple.error.message, 'FAILED')
+    deepStrictEqual(results.multiple.size, 0)
+    deepStrictEqual(results.multiple.min, 0)
+    deepStrictEqual(results.multiple.max, 0)
+    deepStrictEqual(results.multiple.mean, 0)
+    deepStrictEqual(results.multiple.stddev, 0)
+    deepStrictEqual(results.multiple.standardError, 0)
+    deepStrictEqual(results.multiple.percentiles, {})
   })
 }

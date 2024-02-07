@@ -29,11 +29,9 @@ If you need to configure the script at runtime, use environment variables and op
 
 ### TypeScript
 
-cronometro uses [ts-node](https://www.npmjs.com/package/ts-node) to compile TypeScript files on the fly.
+cronometro can run on TypeScript files. Type deletion happens on the fly with no additional configuration required.
 
-ts-node and TypeScript are not installed automatically by cronometro (as they are listed in `peerDependencies`) so you need to do it manually.
-
-To pass the `tsconfig.json` project file to use, use the `TS_NODE_PROJECT` environment variable.
+Use the `TS_NODE_PROJECT` environment variable to provide a TypeScript configuration.
 
 ### API use
 
@@ -102,10 +100,10 @@ Each property value is a object with the following properties:
 import cronometro from 'cronometro'
 
 const results = cronometro({
-  test1: function () {
+  await test1: function () {
     // Do something
   },
-  test2: function () {
+  await test2: function () {
     // Do something else
   }
 })

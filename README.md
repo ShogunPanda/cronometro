@@ -100,10 +100,10 @@ Each property value is a object with the following properties:
 import cronometro from 'cronometro'
 
 const results = cronometro({
-  await test1: function () {
+  async test1() {
     // Do something
   },
-  await test2: function () {
+  async test2() {
     // Do something else
   }
 })

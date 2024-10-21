@@ -10,7 +10,6 @@ export interface PrintOptions {
 
 export type SetupFunctionCallback = (err?: Error | null) => void
 
-// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
 export type SetupFunction = (cb: SetupFunctionCallback) => Promise<any> | void
 
 export interface Options {

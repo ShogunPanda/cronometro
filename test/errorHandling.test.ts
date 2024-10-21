@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-
 import { deepStrictEqual, ifError, ok, rejects } from 'node:assert'
 import { test } from 'node:test'
 import { isMainThread } from 'node:worker_threads'

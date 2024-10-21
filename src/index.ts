@@ -96,7 +96,6 @@ function run(context: Context): void {
   })
 }
 
-// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
 export function cronometro(tests: Tests): Promise<Results> | void
 export function cronometro(tests: Tests, options: Partial<Options>): Promise<Results>
 export function cronometro(tests: Tests, options: Partial<Options>, cb: Callback): undefined
@@ -105,7 +104,6 @@ export function cronometro(
   tests: Tests,
   options?: Partial<Options> | Callback,
   cb?: Callback
-  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
 ): Promise<Results> | void {
   if (!isMainThread) {
     workerData.tests = Object.entries(tests)

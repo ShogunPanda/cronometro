@@ -31,7 +31,7 @@
     "build": "swc --strip-leading-paths --delete-dir-on-start -d dist src",
     "postbuild": "concurrently npm:lint npm:typecheck",
     "format": "prettier -w src test",
-    "lint": "eslint --cache --ext .js,.jsx,.ts,.tsx src test",
+    "lint": "eslint --cache",
     "typecheck": "tsc -p . --emitDeclarationOnly",
     "test": "TS_NODE_PROJECT=tsconfig.test.json c8 -c test/config/c8-local.json node --import @swc-node/register/esm-register --test test/*.test.ts",
     "test:ci": "TS_NODE_PROJECT=tsconfig.test.json c8 -c test/config/c8-ci.json node --import @swc-node/register/esm-register --test-reporter=tap --test test/*.test.ts",
@@ -40,25 +40,25 @@
     "postpublish": "git push origin && git push origin -f --tags"
   },
   "dependencies": {
-    "@swc-node/register": "^1.9.0",
-    "acquerello": "^2.0.8",
+    "@swc-node/register": "^1.10.9",
+    "acquerello": "^3.0.0",
     "hdr-histogram-js": "^3.0.0",
     "table": "^6.8.2"
   },
   "devDependencies": {
-    "@cowtech/eslint-config": "^9.0.3",
-    "@swc/cli": "^0.3.12",
-    "@swc/core": "^1.4.13",
-    "@types/node": "^20.12.7",
-    "c8": "^9.1.0",
-    "chokidar": "^3.6.0",
-    "concurrently": "^8.2.2",
-    "eslint": "^8.57.0",
-    "prettier": "^3.2.5",
+    "@cowtech/eslint-config": "10.0.0",
+    "@swc/cli": "0.4.1-nightly.20240914",
+    "@swc/core": "^1.7.36",
+    "@types/node": "^22.7.7",
+    "c8": "^10.1.2",
+    "chokidar": "^4.0.1",
+    "concurrently": "^9.0.1",
+    "eslint": "^9.13.0",
+    "prettier": "^3.3.3",
     "proxyquire": "^2.1.3",
-    "typescript": "^5.4.5"
+    "typescript": "^5.6.3"
   },
   "engines": {
-    "node": ">= 18.18.0"
+    "node": ">= 20.18.0"
   }
 }

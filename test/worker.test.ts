@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-
 import { deepStrictEqual, ifError, ok } from 'node:assert'
 import { test } from 'node:test'
 import { percentiles, type AsyncTest, type Result } from '../src/index.js'

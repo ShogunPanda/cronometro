@@ -1,3 +1,9 @@
+### 2024-10-21 / 4.0.0
+
+- feat!: Dropped support for Node 18 and updated dependencies.
+- fix: Fixed README example.
+- fix: Remove leftover.
+
 ### 2024-04-12 / 3.0.2
 
 - chore: Updated dependencies.

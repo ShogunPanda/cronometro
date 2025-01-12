@@ -1,3 +1,7 @@
+### 2025-01-12 / 4.0.2
+
+- fix: Better error handling on no test code.
+
 ### 2024-12-28 / 4.0.1
 
 - chore: Updated dependencies.

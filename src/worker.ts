@@ -168,7 +168,13 @@ export function runWorker(context: WorkerContext, notifier: (value: any) => void
   const { warmup, tests, index, iterations, errorThreshold } = context
 
   // Require the original file to build tests
-  const [name, testDefinition] = tests[index]
+  const testToRun = tests?.[index]
+
+  if (!testToRun) {
+    throw new Error('No test code exported from the worker thread')
+  }
+
+  const [name, testDefinition] = testToRun
 
   // Prepare the test
   let test: TestFunction = noOp

@@ -1,3 +1,8 @@
+### 2025-01-19 / 4.0.3
+
+- feat: Merge pull request #7 from simoneb/main
+- chore: support windows
+
 ### 2025-01-12 / 4.0.2
 
 - fix: Better error handling on no test code.

@@ -7,10 +7,6 @@ if (isMainThread) {
   throw new Error('Do not run this file as main script.')
 }
 
-if (workerData.path.endsWith('.ts')) {
-  await import('@swc-node/register/esm-register')
-}
-
 // Require the script to set tests
 try {
   const module = await import(workerData.path)

@@ -39,7 +39,6 @@
     "postpublish": "git push origin && git push origin -f --tags"
   },
   "dependencies": {
-    "@swc-node/register": "^1.10.9",
     "acquerello": "^3.0.1",
     "hdr-histogram-js": "^3.0.0",
     "table": "^6.9.0"
@@ -56,6 +55,6 @@
     "typescript": "^5.7.2"
   },
   "engines": {
-    "node": ">= 20.18.0"
+    "node": ">= 22.6.0"
   }
 }

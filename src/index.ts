@@ -50,7 +50,20 @@ function run(context: Context): void {
     errorThreshold: context.errorThreshold
   }
 
-  const worker = new Worker(runnerPath, { workerData })
+  /* c8 ignore next 5 */
+  let nodeOptions = process.env.NODE_OPTIONS ?? ''
+  const nodeMajor = Number(process.versions.node.split('.')[0])
+  if (nodeMajor < 23) {
+    nodeOptions += ' --experimental-strip-types '
+  }
+
+  const worker = new Worker(runnerPath, {
+    workerData,
+    env: {
+      ...process.env,
+      NODE_OPTIONS: nodeOptions
+    }
+  })
 
   if (context.onTestStart) {
     context.onTestStart(name, workerData, worker)

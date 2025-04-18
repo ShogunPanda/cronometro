@@ -29,9 +29,7 @@ If you need to configure the script at runtime, use environment variables and op
 
 ### TypeScript
 
-cronometro can run on TypeScript files. Type deletion happens on the fly with no additional configuration required.
-
-Use the `TS_NODE_PROJECT` environment variable to provide a TypeScript configuration.
+cronometro can run on TypeScript files via [Node.js native types stripping](https://nodejs.org/dist/latest-v22.x/docs/api/typescript.html#type-stripping).
 
 ### API use
 

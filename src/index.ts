@@ -17,6 +17,7 @@ type PromiseResolver<T> = (value: T) => void
 type PromiseRejecter = (err: Error) => void
 
 export * from './models.ts'
+export { printResults } from './print.ts'
 
 function scheduleNextTest(context: Context): void {
   // We still have work to do

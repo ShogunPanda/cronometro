@@ -1,3 +1,7 @@
+### 2025-04-18 / 5.2.0
+
+- feat: Use tracker.
+
 ### 2025-04-18 / 5.1.0
 
 - feat: Export printResults method.

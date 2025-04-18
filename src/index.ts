@@ -1,3 +1,4 @@
+import { pathToFileURL } from 'node:url'
 import { isMainThread, Worker, workerData } from 'node:worker_threads'
 import {
   defaultOptions,
@@ -43,7 +44,7 @@ function scheduleNextTest(context: Context): void {
 function run(context: Context): void {
   const name = context.tests[context.current][0]
   const workerData = {
-    path: process.argv[1],
+    path: pathToFileURL(process.argv[1]).toString(),
     index: context.current,
     iterations: context.iterations,
     warmup: context.warmup,

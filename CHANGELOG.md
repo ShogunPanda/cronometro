@@ -1,3 +1,7 @@
+### 2025-04-18 / 5.1.0
+
+- feat: Export printResults method.
+
 ### 2025-04-18 / 5.0.0
 
 - fix: Fixed Windows compatibility.

@@ -1,3 +1,9 @@
+### 2025-04-18 / 5.0.0
+
+- fix: Fixed Windows compatibility.
+- feat!: Dropped compatibility for Node 20.x.
+- feat: Added skip option.
+
 ### 2025-01-19 / 4.0.3
 
 - feat: Merge pull request #7 from simoneb/main

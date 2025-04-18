@@ -1,3 +1,7 @@
+### 2025-04-18 / 5.3.0
+
+- feat: Export Tracker.
+
 ### 2025-04-18 / 5.2.0
 
 - feat: Use tracker.

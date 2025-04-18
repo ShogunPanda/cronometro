@@ -1,12 +1,5 @@
-import { build as buildHistogram } from 'hdr-histogram-js'
-import {
-  percentiles,
-  type Result,
-  type SetupFunction,
-  type TestContext,
-  type TestFunction,
-  type WorkerContext
-} from './models.ts'
+import { type Result, type SetupFunction, type TestContext, type TestFunction, type WorkerContext } from './models.ts'
+import { Tracker } from './tracker.ts'
 
 function noOp(): void {
   // No-op
@@ -17,30 +10,18 @@ function noSetup(cb: (err?: Error | null) => void): void {
 }
 
 function handleTestIteration(context: TestContext, error?: Error | null): void {
-  // Grab duration even in case of error to make sure we don't add any overhead to the benchmark
-  const duration = Number(process.hrtime.bigint() - context.start)
-
   // Handle error
   if (error) {
-    context.callback({
-      success: false,
-      error,
-      size: 0,
-      min: 0,
-      max: 0,
-      mean: 0,
-      stddev: 0,
-      percentiles: {},
-      standardError: 0
-    })
+    context.tracker.error = error
+    context.callback(context.tracker.results)
     return
   }
 
   // Get some parameters
-  const { histogram, total, errorThreshold } = context
+  const { tracker, total, errorThreshold } = context
 
   // Track results
-  histogram.recordValue(duration)
+  tracker.track(context.start)
   context.executed++
 
   // Check if stop earlier if we are below the error threshold
@@ -52,7 +33,7 @@ function handleTestIteration(context: TestContext, error?: Error | null): void {
 
     // Check if abort the test earlier. It is checked every 5% after 10% of the iterations
     if (completedPercentage >= 1000 && completedPercentage % 500 === 0) {
-      const standardErrorPercentage = histogram.stdDeviation / Math.sqrt(executed) / histogram.mean
+      const standardErrorPercentage = tracker.standardError / tracker.histogram.mean
 
       if (standardErrorPercentage < errorThreshold) {
         stop = true
@@ -62,20 +43,7 @@ function handleTestIteration(context: TestContext, error?: Error | null): void {
 
   // If the test is over
   if (stop || executed > total) {
-    const stdDev = histogram.stdDeviation
-
-    context.callback({
-      success: true,
-      size: executed,
-      min: histogram.minNonZeroValue,
-      max: histogram.maxValue,
-      mean: histogram.mean,
-      stddev: stdDev,
-      percentiles: Object.fromEntries(
-        percentiles.map(percentile => [percentile, histogram.getValueAtPercentile(percentile)])
-      ),
-      standardError: stdDev / Math.sqrt(executed)
-    })
+    context.callback(tracker.results)
     return
   }
 
@@ -204,11 +172,7 @@ export function runWorker(context: WorkerContext, notifier: (value: any) => void
     errorThreshold,
     total: iterations - 1,
     executed: 0,
-    histogram: buildHistogram({
-      lowestDiscernibleValue: 1,
-      highestTrackableValue: 1e9,
-      numberOfSignificantValueDigits: 5
-    }),
+    tracker: new Tracker(),
     start: BigInt(0),
     handler: noOp,
     notifier,

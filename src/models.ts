@@ -1,6 +1,6 @@
-import { type Histogram } from 'hdr-histogram-js'
 import { fileURLToPath } from 'node:url'
 import { type Worker } from 'node:worker_threads'
+import { type Tracker } from './tracker.ts'
 
 export interface PrintOptions {
   colors?: boolean
@@ -84,7 +84,7 @@ export interface TestContext {
   errorThreshold: number
   total: number
   executed: number
-  histogram: Histogram
+  tracker: Tracker
   start: bigint
   handler: (error?: Error | null) => void
   notifier: (value: any) => void

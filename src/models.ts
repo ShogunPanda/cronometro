@@ -1,5 +1,4 @@
 import { type Histogram } from 'hdr-histogram-js'
-import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { type Worker } from 'node:worker_threads'
 
@@ -27,12 +26,13 @@ export interface Options {
 export type StaticTest = () => any
 export type AsyncTest = (cb: Callback) => any
 export type PromiseTest = () => Promise<any>
-export type TestFunction = StaticTest | AsyncTest | PromiseTest
+export type TestFunction = (StaticTest | AsyncTest | PromiseTest) & { skip?: boolean }
 
 export interface Test {
   test?: TestFunction
   before?: SetupFunction
   after?: SetupFunction
+  skip?: boolean
 }
 
 export type Percentiles = Record<string, number>
@@ -100,9 +100,4 @@ export const defaultOptions = {
 
 export const percentiles = [0.001, 0.01, 0.1, 1, 2.5, 10, 25, 50, 75, 90, 97.5, 99, 99.9, 99.99, 99.999]
 
-export const runnerPath = resolve(
-  dirname(fileURLToPath(import.meta.url))
-    .replace('src', 'dist')
-    .replace(/models.(js|ts)/, ''),
-  './runner.js'
-)
+export const runnerPath = fileURLToPath(new URL(`./runner.${import.meta.url.slice(-2)}`, import.meta.url))

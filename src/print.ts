@@ -1,6 +1,6 @@
 import { clean, colorize } from 'acquerello'
 import { table } from 'table'
-import { type Results } from './models.js'
+import { type Results } from './models.ts'
 
 const styles = ['red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white', 'gray']
 

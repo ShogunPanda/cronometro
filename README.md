@@ -58,6 +58,7 @@ A test can be defined as a function containing the test to run or an object cont
 - `test`: The function containing the test to run. If omitted, the test will be a no-op.
 - `before`: A setup function to execute before starting test iteration.
 - `after`: A cleanup function to execute after all test iteration have been run.
+- `skip`: If a test should be skipped.
 
 Each of the `test` functions above can be either a function, a function accepting a Node style callback or a function returning a promise (hence also async functions).
 

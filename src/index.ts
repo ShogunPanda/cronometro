@@ -9,13 +9,13 @@ import {
   type Result,
   type Results,
   type Tests
-} from './models.js'
-import { printResults } from './print.js'
+} from './models.ts'
+import { printResults } from './print.ts'
 
 type PromiseResolver<T> = (value: T) => void
 type PromiseRejecter = (err: Error) => void
 
-export * from './models.js'
+export * from './models.ts'
 
 function scheduleNextTest(context: Context): void {
   // We still have work to do
@@ -106,7 +106,7 @@ export function cronometro(
   cb?: Callback
 ): Promise<Results> | void {
   if (!isMainThread) {
-    workerData.tests = Object.entries(tests)
+    workerData.tests = Object.entries(tests).filter(test => test[1]?.skip !== true)
     return
   }
 
@@ -174,7 +174,7 @@ export function cronometro(
     iterations,
     errorThreshold: errorThreshold / 100,
     print,
-    tests: Object.entries(tests), // Convert tests to a easier to process [name, func] list,
+    tests: Object.entries(tests).filter(test => test[1]?.skip !== true), // Convert tests to a easier to process [name, func] list,
     results: {},
     current: 0,
     callback,

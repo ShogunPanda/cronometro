@@ -1,7 +1,6 @@
 {
   "check-coverage": true,
   "reporter": ["text", "json"],
-  "exclude": ["dist", "test"],
   "branches": 90,
   "functions": 90,
   "lines": 90,

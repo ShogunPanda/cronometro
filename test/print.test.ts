@@ -1,8 +1,8 @@
 import { deepStrictEqual, ifError, match, ok } from 'node:assert'
 import { test } from 'node:test'
 import { isMainThread } from 'node:worker_threads'
-import { cronometro, defaultOptions, percentiles } from '../src/index.js'
-import { setLogger } from '../src/print.js'
+import { cronometro, defaultOptions, percentiles } from '../src/index.ts'
+import { setLogger } from '../src/print.ts'
 
 function removeStyle(source: string): string {
   // eslint-disable-next-line no-control-regex

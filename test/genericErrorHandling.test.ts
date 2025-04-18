@@ -1,7 +1,7 @@
 import { deepStrictEqual, ok } from 'node:assert'
 import { test } from 'node:test'
 import { isMainThread } from 'node:worker_threads'
-import { cronometro, type Tests } from '../src/index.js'
+import { cronometro, type Tests } from '../src/index.ts'
 
 if (!isMainThread) {
   cronometro(undefined as unknown as Tests, () => false)

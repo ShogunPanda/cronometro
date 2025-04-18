@@ -1,4 +1,6 @@
 {
-  "exclude": ["dist", "test"],
-  "reporter": ["text", "html"]
+  "reporter": ["text", "html"],
+  "all": true,
+  "include": ["src/**/*.ts"],
+  "exclude": ["**/node_modules/**", "test/**/*.ts"]
 }

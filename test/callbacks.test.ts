@@ -1,7 +1,7 @@
 import { deepStrictEqual, match, ok } from 'node:assert'
 import { test } from 'node:test'
 import { Worker, isMainThread, parentPort } from 'node:worker_threads'
-import { cronometro, type Result, type TestFunction } from '../src/index.js'
+import { cronometro, type Result, type TestFunction } from '../src/index.ts'
 
 if (!isMainThread) {
   parentPort!.postMessage('another')
@@ -14,7 +14,11 @@ if (!isMainThread) {
       multiple() {
         throw new Error('INVALID')
       },
-      missing: undefined as unknown as TestFunction
+      missing: undefined as unknown as TestFunction,
+      skipped: {
+        test() {},
+        skip: true
+      }
     },
     () => false
   )
@@ -30,6 +34,10 @@ if (!isMainThread) {
         },
         missing() {
           Buffer.alloc(10)
+        },
+        skipped: {
+          test() {},
+          skip: true
         }
       },
       {

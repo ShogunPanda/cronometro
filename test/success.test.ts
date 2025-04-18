@@ -1,7 +1,7 @@
 import { deepStrictEqual, ifError, ok } from 'node:assert'
 import { test } from 'node:test'
 import { isMainThread } from 'node:worker_threads'
-import { cronometro, percentiles } from '../src/index.js'
+import { cronometro, percentiles } from '../src/index.ts'
 
 if (!isMainThread) {
   cronometro(

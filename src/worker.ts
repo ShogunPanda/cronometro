@@ -6,7 +6,7 @@ import {
   type TestContext,
   type TestFunction,
   type WorkerContext
-} from './models.js'
+} from './models.ts'
 
 function noOp(): void {
   // No-op

@@ -1,7 +1,7 @@
 import { deepStrictEqual, ifError, ok } from 'node:assert'
 import { test } from 'node:test'
-import { percentiles, type AsyncTest, type Result } from '../src/index.js'
-import { runWorker } from '../src/worker.js'
+import { percentiles, type AsyncTest, type Result } from '../src/index.ts'
+import { runWorker } from '../src/worker.ts'
 
 test('Worker execution - Handle sync functions that succeed', (t, done) => {
   let mainCalls = 0

@@ -1,7 +1,7 @@
 import { deepStrictEqual, ifError, ok, rejects } from 'node:assert'
 import { test } from 'node:test'
 import { isMainThread } from 'node:worker_threads'
-import { cronometro, percentiles } from '../src/index.js'
+import { cronometro, percentiles } from '../src/index.ts'
 
 if (!isMainThread) {
   cronometro(
@@ -57,7 +57,7 @@ if (!isMainThread) {
   })
 
   test('Runner cannot be run in main thread', async () => {
-    await rejects(import('../src/runner.js'), { message: 'Do not run this file as main script.' })
+    await rejects(import('../src/runner.ts'), { message: 'Do not run this file as main script.' })
   })
 
   test('Runner reports setup errors', async () => {

@@ -1,6 +1,6 @@
 import { deepStrictEqual, ok, rejects } from 'node:assert'
 import { test } from 'node:test'
-import { cronometro } from '../src/index.js'
+import { cronometro } from '../src/index.ts'
 
 test('Options validation', async () => {
   await rejects(

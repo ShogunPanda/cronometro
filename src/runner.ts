@@ -1,7 +1,7 @@
 /* c8 ignore start */
 import { isMainThread, parentPort, workerData } from 'node:worker_threads'
-import { type WorkerContext } from './models.js'
-import { runWorker } from './worker.js'
+import { type WorkerContext } from './models.ts'
+import { runWorker } from './worker.ts'
 
 if (isMainThread) {
   throw new Error('Do not run this file as main script.')

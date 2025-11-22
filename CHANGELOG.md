@@ -1,3 +1,7 @@
+### 2025-11-22 / 6.0.0
+
+- feat!: Dropped support for Node 20.
+
 ### 2025-04-18 / 5.3.0
 
 - feat: Export Tracker.

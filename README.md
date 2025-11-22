@@ -15,7 +15,7 @@ Cronometro uses [worker_threads](https://nodejs.org/dist/latest-v12.x/docs/api/w
 
 ### Supported Node versions
 
-Only Node 12.x and above are supported.
+Only Node 22.x and above are supported.
 
 This package only supports to be directly imported in a ESM context.
 

@@ -1,3 +1,7 @@
+### 2025-11-24 / 6.0.2
+
+- chore: Updated dependencies.
+
 ### 2025-11-22 / 6.0.1
 
 - chore: Updated dependencies.

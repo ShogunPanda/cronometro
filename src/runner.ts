@@ -1,6 +1,6 @@
 /* c8 ignore start */
+import type { WorkerContext } from './models.ts'
 import { isMainThread, parentPort, workerData } from 'node:worker_threads'
-import { type WorkerContext } from './models.ts'
 import { runWorker } from './worker.ts'
 
 if (isMainThread) {

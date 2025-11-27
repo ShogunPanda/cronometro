@@ -1,4 +1,4 @@
-import { type Result, type SetupFunction, type TestContext, type TestFunction, type WorkerContext } from './models.ts'
+import type { Result, SetupFunction, TestContext, TestFunction, WorkerContext } from './models.ts'
 import { Tracker } from './tracker.ts'
 
 function noOp(): void {

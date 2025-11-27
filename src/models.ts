@@ -1,6 +1,6 @@
+import type { Worker } from 'node:worker_threads'
+import type { Tracker } from './tracker.ts'
 import { fileURLToPath } from 'node:url'
-import { type Worker } from 'node:worker_threads'
-import { type Tracker } from './tracker.ts'
 
 export interface PrintOptions {
   colors?: boolean

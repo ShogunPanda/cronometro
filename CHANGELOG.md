@@ -1,3 +1,8 @@
+### 2025-11-27 / 6.0.3
+
+- fix: Correctly sort type only imports.
+- chore: Removed leftover script.
+
 ### 2025-11-24 / 6.0.2
 
 - chore: Updated dependencies.

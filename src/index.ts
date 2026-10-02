@@ -72,7 +72,7 @@ function run(context: Context): void {
     context.onTestStart(name, workerData, worker)
   }
 
-  worker.on('error', error => {
+  worker.on('error', (error: Error) => {
     context.results[name] = {
       success: false,
       error,
